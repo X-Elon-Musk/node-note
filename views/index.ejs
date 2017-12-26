@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>node-note</title>
+    <link href="css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="css/reset.css" rel="stylesheet"/>
+    <style type="text/css">
+        .container{
+            padding-top: 15px;
+        }
+        .record{
+            display: block;
+            margin-top: 15px;
+            width: 100%;
+            color: #fff!important;
+            background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #6cdaa8), to(#42b983));
+            background-image: linear-gradient(to bottom, #6cdaa8 0, #42b983 100%);
+            filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff6cdaa8', endColorstr='#ff42b983', GradientType=0);
+            filter: progid:DXImageTransform.Microsoft.gradient(enabled=false);
+            background-repeat: repeat-x;
+            border-color: #42b983!important;
+            text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.2);
+            -webkit-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 1px 1px rgba(0, 0, 0, 0.075);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 1px 1px rgba(0, 0, 0, 0.075);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <form class="form-horizontal">
+        <textarea class="form-control text" rows="3"></textarea>
+        <button type="submit" class="btn btn-default record">记录</button>
+    </form>
+</div>
+
+
+
+<script src="js/jquery-1.11.3.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script type="text/javascript" src="js/underscore-noflect.js"></script>
+
+<script type="text/javascript">
+    $('.record').click(function () {
+        $.post('/record',{
+            'text': $('.text').val()
+        },function (result) {
+            if (result.result==-1) {
+                
+            } else if(result.result==1){
+                console.log(1);
+            }      
+        })   
+    })
+</script>
+</body>
+</html>
