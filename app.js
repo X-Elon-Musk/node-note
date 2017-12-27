@@ -1,6 +1,14 @@
 var express = require("express");
 var app = express();
 var router=require('./router/router.js');
+var session =require('express-session');
+
+//使用session
+app.use(session({
+    secret: 'keyboard cat',
+    resave: false,
+    saveUninitialized: true
+}))
 
 //设置模板引擎
 app.set("view engine", "ejs");
@@ -12,53 +20,13 @@ app.use(express.static("./public"));
 
 //显示首页
 app.get('/',router.showIndex);
+//显示注册页面
+app.get('/register',router.showRegister);
+//注册
+app.post('/doRegister',router.doRegister);
 //发表记录
-app.post('/record',router.record);  
+app.post('/record',router.record); 
+//查找所有消息
+// app.get('/getAll',router.getAll);
 
-
-
-
-
-
-/*//读取所有留言，这个页面是供Ajax使用的
-app.get("/du", function (req, res, next) {
-    //可以接受一个参数
-    var page = parseInt(req.query.page);
-
-    db.find("liuyanben",{},{"sort":{"shijian":-1},"pageamount":20,"page":page},function(err,result){
-        res.json({"result":result});
-    });
-});
-
-//处理留言
-app.post("/tijiao", function (req, res, next) {
-    var form = new formidable.IncomingForm();
-
-    form.parse(req, function (err, fields) {
-        //写入数据库
-        db.insertOne("liuyanben", {
-            "xingming" : fields.xingming,
-            "liuyan" : fields.liuyan,
-            "shijian" : new Date()
-        }, function (err, result) {
-            if(err){
-                res.send({"result":-1}); //-1是给Ajax看的
-                return;
-            }
-            res.json({"result":1});
-        });
-    });
-});
-
-
-//删除
-app.get("/shanchu",function(req,res,next){
-    //得到参数
-    var id = req.query.id;
-    db.deleteMany("liuyanben",{"_id":ObjectId(id)},function(err,result){
-
-        res.redirect("/");
-    });
-})*/
-
-app.listen(3000);
+app.listen(3100);

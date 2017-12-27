@@ -1,0 +1,218 @@
+html, body, div, span, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+abbr, address, cite, code,
+del, dfn, em, img, ins, kbd, q, samp,
+small, strong, sub, sup, var,
+b, i,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, figcaption, figure, 
+footer, header, hgroup, menu, nav, section, summary,
+time, mark, audio, video {
+    margin:0;
+    padding:0;
+    border:0;
+    outline:0;
+    font-size:100%;
+    vertical-align:baseline;
+    background:transparent;
+}
+
+body {
+    line-height:1;
+}
+
+:focus {
+	outline: 1;
+}
+
+article,aside,canvas,details,figcaption,figure,
+footer,header,hgroup,menu,nav,section,summary { 
+    display:block;
+}
+
+nav ul {
+    list-style:none;
+}
+
+blockquote, q {
+    quotes:none;
+}
+
+blockquote:before, blockquote:after,
+q:before, q:after {
+    content:'';
+    content:none;
+}
+
+a {
+    margin:0;
+    padding:0;
+    border:0;
+    font-size:100%;
+    vertical-align:baseline;
+    background:transparent;
+}
+
+ins {
+    background-color:#ff9;
+    color:#000;
+    text-decoration:none;
+}
+
+mark {
+    background-color:#ff9;
+    color:#000; 
+    font-style:italic;
+    font-weight:bold;
+}
+
+del {
+    text-decoration: line-through;
+}
+
+abbr[title], dfn[title] {
+    border-bottom:1px dotted #000;
+    cursor:help;
+}
+
+table {
+    border-collapse:collapse;
+    border-spacing:0;
+}
+
+hr {
+    display:block;
+    height:1px;
+    border:0;   
+    border-top:1px solid #cccccc;
+    margin:1em 0;
+    padding:0;
+}
+
+input, select {
+    vertical-align:middle;
+}
+body{
+    padding: 0;
+    margin: 0;
+}
+ul,li{
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+/*定义滚动条高宽及背景 高宽分别对应横竖滚动条的尺寸*/  
+::-webkit-scrollbar  
+{  
+    width: 1px;  
+    height: 1px;  
+    background-color: rgba(0,0,0,0.3);  
+}  
+  
+/*定义滚动条轨道 内阴影+圆角*/  
+::-webkit-scrollbar-track  
+{  
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.2);  
+    border-radius: 10px;  
+    // background-color: #F5F5F5;  
+    background-color: #fff;  
+}  
+  
+/*定义滑块 内阴影+圆角*/  
+::-webkit-scrollbar-thumb  
+{  
+    border-radius: 10px;  
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);  
+    background-color: rgba(0,0,0,0.1);  
+}  
+/* 公共样式 */
+body {
+    font-family:  "Helvetica Neue", Arial, sans-serif;
+    font-size: 15px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    color: #34495e!important;
+    background-color: #fff;
+    margin: 0;
+    word-spacing: 0.05em;
+    line-height: 1.6em;
+}
+.clearfix:after {
+    content: " ";
+    display: block;
+    clear: both;
+    height: 0;
+}
+.clearfix {
+  zoom: 1;
+}
+.f_l{
+    float: left;
+}
+.f_r{
+    float: right;
+}
+.exh{
+    padding: 1.2em 1.4em;
+    background-color: #f8f8f8;
+    overflow: hidden;
+}
+@media screen and (max-width: 900px) {
+    .child-view{
+        padding: 2em 1.4em 60px;
+    }
+}
+
+/* bootstrap样式修改 */
+.btn-default.active, .btn-default:active, .open>.dropdown-toggle.btn-default {
+    color: #fff!important;
+    background-image: -webkit-linear-gradient(top,#6cdaa8 0,#42b983 100%);
+    background-image: -o-linear-gradient(top,#6cdaa8 0,#42b983 100%);
+    background-image: -webkit-gradient(linear,left top,left bottom,from(#6cdaa8),to(#42b983));
+    background-image: linear-gradient(to bottom, #6cdaa8 0, #42b983 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff6cdaa8', endColorstr='#ff42b983', GradientType=0);
+    filter: progid:DXImageTransform.Microsoft.gradient(enabled=false);
+    background-repeat: repeat-x;
+    border-color: #42b983!important;
+    text-shadow: 0 -1px 0 rgba(0,0,0,.2);
+    -webkit-box-shadow: inset 0 1px 0 rgba(255,255,255,.15), 0 1px 1px rgba(0,0,0,.075);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.15), 0 1px 1px rgba(0,0,0,.075);
+}
+.btn-default:hover {
+    color: #333;
+    background-color: #fff;
+    border-color: #ccc;
+}
+.btn-customized{
+    display: block;
+    margin-top: 15px;
+    width: 100%;
+    color: #fff!important;
+    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #6cdaa8), to(#42b983));
+    background-image: linear-gradient(to bottom, #6cdaa8 0, #42b983 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff6cdaa8', endColorstr='#ff42b983', GradientType=0);
+    filter: progid:DXImageTransform.Microsoft.gradient(enabled=false);
+    background-repeat: repeat-x;
+    border-color: #42b983!important;
+    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.2);
+    -webkit-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 1px 1px rgba(0, 0, 0, 0.075);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 1px 1px rgba(0, 0, 0, 0.075);
+}
+.form-control{
+    padding: 6px 1em;
+}
+.form-control:focus {
+    border-color: #42b983;
+    outline: 0;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+}
+/* 公共样式 */
+body{
+    width: 100%;
+}
+.vs{
+    padding: 2em 1.4em 2em;
+}

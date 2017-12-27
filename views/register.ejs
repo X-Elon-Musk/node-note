@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link rel="icon" href="/images/favicon.ico">
+    <title>注册</title>
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- <link href="/css/jumbotron.css" rel="stylesheet"> -->
+    <link rel="stylesheet/less" href="/css/github.less"/>
+    <link rel="stylesheet/less" href="/css/reset.less"/>
+    <link rel="stylesheet/less" href="/css/main.less"/>
+    <link href="//netdna.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script src="/js/less.js" type="text/javascript" charset="utf-8"></script>
+</head>
+<body>
+<div class="vs register">
+        <form>
+            <div class="form-item clearfix">
+                <i class="fa fa-user-circle-o fa-lg label-icon"></i>
+                <input type="text" class="form-control" id="username" placeholder="请输入用户名">
+            </div>
+            <div class="form-item clearfix">
+                <i class="fa fa-lock fa-lg label-icon"></i>
+                <input type="password" class="form-control" id="password" placeholder="请输入密码">
+            </div>
+            <div class="prompt" role="alert">错误</div>
+            <button type="button" class="btn btn-customized" id="submit">注册</button>
+        </form>
+</div>
+<script src="/js/jquery-1.11.3.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<!-- <script src="/js/common.js"></script> -->
+<script type="text/javascript">
+    $('#submit').click(function () {
+        if ($('#username').val()=='') {
+            $('.prompt').html('请填写用户名').css({
+                'visibility': 'visible'
+            });
+            return;
+        }
+        if ($('#password').val()=='') {
+            $('.prompt').html('请填写密码').css({
+                'visibility': 'visible'
+            });
+            return;
+        }
+        console.log(1);
+        $.post('/doRegister',{
+            'username': $('#username').val(),
+            'password': $('#password').val()
+        },function (result) {
+            console.log(4,result);
+            if (result=='1') {
+                alert('成功注册，页面将跳转到首页');  
+                window.location='/';
+            } else if(result=='-1'){
+                $('.prompt').html('用户名被占用！').css({
+                    'visibility': 'visible'
+                });
+            }
+        })
+    })
+    /*$(".agree_checkbox").on("click",function(){
+        $(this).toggleClass( "on_check" );
+    })
+    $('input').focusin(function () {
+        $('.alert_prompt').fadeOut();
+    })
+    $('.btn_submit').click(function () {
+        if ($('#username').val()=='') {
+            $('.alert_prompt').html('请填写用户名').fadeIn();
+            return;
+        }
+        if ($('#password').val()=='') {
+            $('.alert_prompt').html('请填写密码').fadeIn();
+            return;
+        }
+        if (!$('.agreement').is(':checked')) {
+            $('.alert_prompt').html('请勾选遵守用户协议').fadeIn();
+            return;
+        }
+        $.post('/doRegister',{
+            'username':$('#username').val(),
+            'password':$('#password').val()
+        }, function (result) {
+            if (result=='1') {
+                alert('成功注册，页面将跳转到首页');
+                window.location='/';
+            } else if(result=='-1'){
+                $('.alert_prompt').html('用户名被占用！').fadeIn();
+            }
+        })
+    })*/
+</script>
+</body>
+</html>
