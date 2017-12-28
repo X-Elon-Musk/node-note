@@ -21,6 +21,7 @@ time, mark, audio, video {
 
 body {
     line-height:1;
+    font-family: "Helvetica Neue", Arial, sans-serif;
 }
 
 :focus {
@@ -103,6 +104,9 @@ ul,li{
     padding: 0;
     margin: 0;
 }
+strong{
+    font-weight: normal;
+}
 /*定义滚动条高宽及背景 高宽分别对应横竖滚动条的尺寸*/  
 ::-webkit-scrollbar  
 {  
@@ -159,9 +163,6 @@ body {
     background-color: #f8f8f8;
     overflow: hidden;
 }
-textarea{
-    resize: none;
-}
 
 
 /* bootstrap样式修改 */
@@ -208,10 +209,23 @@ textarea{
     -webkit-box-shadow: none;
     box-shadow: none;
 }
-/* 公共样式 */
+.container{
+    padding-top: 15px;
+}
+/* 添加reset样式 */
 body{
     width: 100%;
+    color: #34495e!important;
 }
 .vs{
     padding: 2em 1.4em 2em;
 }
+textarea{
+    resize: none;
+}
+/* 改变输入框的光标颜色和内容文字颜色 */
+input, textarea, [contenteditable] { 
+    color: #34495e; 
+    caret-color: #42b983; 
+}
+/* 修改样式 */

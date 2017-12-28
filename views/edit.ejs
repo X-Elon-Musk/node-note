@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>node-note</title>
+    <link href="/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="/css/reset.less" rel="stylesheet/less"/>
+    <link href="/css/main.less" rel="stylesheet/less"/>
+    <link rel="stylesheet" href="/font-awesome/css/font-awesome.min.css">
+    <script src="/js/less.js" type="text/javascript" charset="utf-8"></script>
+</head>
+<body>
+
+<div class="container edit_page">
+    <header class="clearfix header">
+        <a href="javascript:;" class="return-button">
+            <i class="fa fa-chevron-left fa-lg memorandum"></i>
+            备忘录
+        </a>
+        <strong class="complete f_r" id="complete">完成</strong>
+    </header>
+    <div class="content">
+        <%=username%>
+        <p class="time">
+            111111
+        </p>
+        <textarea class="form-control text" rows="3"></textarea>
+    </div>
+    <div class="footer clearfix">
+        <span class="f_l trash">
+            <i class="fa fa-trash fa-lg"></i>
+        </span>
+        <span class="f_r edit" id="edit">
+            <i class="fa fa-edit fa-lg"></i>
+        </span>
+    </div>
+</div>
+
+
+
+<script src="js/jquery-1.11.3.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script type="text/javascript" src="js/underscore-noflect.js"></script>
+
+<script type="text/javascript">
+    $('.return-button').click(function () {
+        $.post('/record',{
+            'content': $('.text').val()
+        },function (result) {
+            if (result.result=='1') {
+                window.location='/showPages';
+            } else if(result.result=='-3'){
+                console.log(1);
+            }      
+        })   
+    })
+    //编辑
+    $('#edit').click(function () {
+        $('.text').focus();  
+    })
+    //退出编辑
+    $('#complete').click(function () {
+        $('.text').blur();  
+    })
+    //返回备忘录列表
+    $('.return-button').click(function () {
+        window.location="/showPages";   
+    })
+</script>
+</body>
+</html>
