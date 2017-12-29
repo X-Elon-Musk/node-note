@@ -26,7 +26,9 @@
         <p class="time">
             111111
         </p>
-        <textarea class="form-control text" rows="3"></textarea>
+        <form>
+            <textarea class="form-control text" rows="3"></textarea>
+        </form>
     </div>
     <div class="footer clearfix">
         <span class="f_l trash">
@@ -45,13 +47,16 @@
 <script type="text/javascript" src="js/underscore-noflect.js"></script>
 
 <script type="text/javascript">
+    //返回备忘录列表
     $('.return-button').click(function () {
+        console.log('点击',$('.text').val());
         $.post('/record',{
             'content': $('.text').val()
         },function (result) {
-            if (result.result=='1') {
+            console.log(result);
+            if (result=='1') {
                 window.location='/showPages';
-            } else if(result.result=='-3'){
+            } else if(result=='-3'){
                 console.log(1);
             }      
         })   
@@ -64,10 +69,11 @@
     $('#complete').click(function () {
         $('.text').blur();  
     })
-    //返回备忘录列表
-    $('.return-button').click(function () {
+    
+    /*$('.return-button').click(function () {
+
         window.location="/showPages";   
-    })
+    })*/
 </script>
 </body>
 </html>

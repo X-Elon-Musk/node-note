@@ -14,6 +14,15 @@
     <script src="js/bootstrap.min.js"></script>
     <script type="text/javascript" src="js/underscore-noflect.js"></script>
     <script src="/js/lib/knockout-3.4.0.js"></script>
+    <script type="text/javascript">
+        (function(){
+            var html = document.querySelector("html");
+            var width = html.getBoundingClientRect().width;
+            html.style.fontSize = width/25 + "px";
+        })();
+        // @w:1/30rem;        
+    </script>
+        
 </head>
 <body>
 
@@ -27,7 +36,13 @@
     </header> -->
     <%- include('header') -%>
     <div class="content">
-        
+        <div id="notes">
+            <ul class="notes-items" data-bind="foreach:notes.list">
+                <li class="notes-item">
+                    <!-- <span data-bind="text:"></span> -->
+                </li>
+            </ul>
+        </div>
     </div>
     <%- include('footer') -%>
     
@@ -62,14 +77,23 @@
         window.location="/register";   
     })
     getNotes();
+    var notes;
     //获取个人所有备忘录文本
     function getNotes() {
+        console.log(1);
         $.ajax({
             'url': '/getNotes',
             'type': 'get',
             'success': function (result) {
                 if (result) {
                     console.log(result);
+                    if (!notes) {
+                        notes={
+                            list: ko.observableArray()
+                        };
+                        ko.applyBindings(notes,document.getElementById("notes"));
+                    }
+                    notes.list(result);
                 } else{
                     // alert('错误！');
                 }

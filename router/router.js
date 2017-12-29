@@ -39,7 +39,7 @@ exports.doLogin=function (req,res,next) {
         var password=fields.password;
         var password_md5=md5(md5(password)+'792884274');
         mysql.find(user_sql.getInfo,[username],function (err,result) {
-            console.log(result[0].id);
+            // console.log(result[0].id);
             if (err) {
                 res.send('-3');//服务器错误
                 return;                   
@@ -71,10 +71,10 @@ exports.showPages=function (req,res,next) {
 }
 //获取个人所有备忘录文本
 exports.getNotes=function (req,res,next) {
+    console.log('getNotes');
     var user_id=req.session.user_id;
     mysql.find(note_sql.getNotes,[user_id],function (err,result) {
-        // req.session.user_id=result[]
-        // console.log(111,result[0].id);
+        // console.log(result[0].text,2222);
         if (err||result.length==0) {
             res.json('');
             return;         
@@ -82,6 +82,7 @@ exports.getNotes=function (req,res,next) {
         var obj={
             'text': result[0].text
         };
+        console.log(obj,333);
         res.json(obj);
     })
     function getNowFormatDate(date) {
@@ -119,18 +120,17 @@ exports.record= function (req,res,next) {
     var form=new formidable.IncomingForm();
     form.parse(req, function (err,fields,files) {
         var content=fields.content;
-        console.log(content,req.session.user_id);
+        console.log(req.session.user_id,content);
+        // console.log(content,req.session.user_id);
         mysql.insertOne(note_sql.insert,[req.session.user_id,content],function (err,result) {
+            // console.log(err);
             if (err) {
                 res.send('-3');
                 return;         
             }
             res.send('1');//发表成功
-            
         })
-        
-    })
-    
+    }) 
 }
 
 
@@ -159,7 +159,7 @@ exports.doRegister=function (req,res,next) {
         var password=fields.password;
         mysql.find(user_sql.getId,[username],function (err,result) {
             // req.session.user_id=result[]
-            console.log(111,result);
+            // console.log(111,result);
             if (err) {
                 res.send('-3');//服务器错误
                 return;         
