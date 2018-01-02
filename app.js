@@ -19,20 +19,23 @@ app.use(express.static("./public"));
 
 
 //显示首页(登录页面)
-app.get('/',router.showIndex);
+app.get('/',router.index);
 //登录
-app.post('/doLogin',router.doLogin);
+app.post('/login',router.login);
+//显示注册页面
+app.get('/noteRegister',router.noteRegister);
+//注册
+app.post('/register',router.register);
 //显示备忘录
-app.get('/showPages',router.showPages);
+app.get('/notePages',router.notePages);
 //获取个人所有备忘录文本
-app.get('/getNotes',router.getNotes);
+app.get('/noteNotes',router.noteNotes);
 //显示编辑页面
-app.get('/showEdit',router.showEdit);
+app.get('/noteEdit',router.noteEdit);
 //发表备忘记录
 app.post('/record',router.record);
 
-/*//显示注册页面
-app.get('/register',router.showRegister);
+/*
 //注册
 app.post('/doRegister',router.doRegister);
 

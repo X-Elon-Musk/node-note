@@ -29,12 +29,6 @@ exports.insertOne=function (sql,params,callback) {
 }
 //得到总信息
 exports.find=function (sql,params,callback) {
-	// var result=[];
-	/*if (collectionName=='users') {
-		collectionName=user_sql.getByName;	
-	} else if(collectionName=='notes'){
-		collectionName=note_sql.queryAll;
-	}*/
 	connection.query(sql,params,function (err,result) {
 		if (err) {
 			callback(err,null);

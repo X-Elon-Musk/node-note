@@ -22,12 +22,12 @@
         <strong class="complete f_r" id="complete">完成</strong>
     </header>
     <div class="content">
-        <%=username%>
-        <p class="time">
-            111111
-        </p>
         <form>
-            <textarea class="form-control text" rows="3"></textarea>
+            <div class="note-time">
+                <%=notetime%>
+            </div>
+            <input type="hidden" value="<%=notetime%>" name="time">
+            <textarea class="form-control text" rows="3" name="content"></textarea>
         </form>
     </div>
     <div class="footer clearfix">
@@ -43,23 +43,27 @@
 
 
 <script src="js/jquery-1.11.3.min.js"></script>
-<script src="js/bootstrap.min.js"></script>
-<script type="text/javascript" src="js/underscore-noflect.js"></script>
 
 <script type="text/javascript">
     //返回备忘录列表
     $('.return-button').click(function () {
-        console.log('点击',$('.text').val());
-        $.post('/record',{
-            'content': $('.text').val()
-        },function (result) {
-            console.log(result);
-            if (result=='1') {
-                window.location='/showPages';
-            } else if(result=='-3'){
-                console.log(1);
-            }      
-        })   
+        var content=$('.text').val();
+        var data=decodeURIComponent($('form').serialize(),true);
+        if (content=='') {
+            window.location='/notePages';          
+        } else{
+            // console.log($('form').serialize());
+            $.post('/record',{
+                'data': data
+            },function (result) {
+                console.log(result);
+                if (result=='1') {
+                    window.location='/notePages';
+                } else if(result=='-3'){
+                    return;//数据库查询错误
+                }      
+            },'json')   
+        }
     })
     //编辑
     $('#edit').click(function () {
@@ -69,11 +73,6 @@
     $('#complete').click(function () {
         $('.text').blur();  
     })
-    
-    /*$('.return-button').click(function () {
-
-        window.location="/showPages";   
-    })*/
 </script>
 </body>
 </html>

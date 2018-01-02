@@ -20,26 +20,21 @@
             var width = html.getBoundingClientRect().width;
             html.style.fontSize = width/25 + "px";
         })();
-        // @w:1/30rem;        
+        // @w:1/30rem; 
+
     </script>
         
 </head>
 <body>
 
 <div class="container home">
-    <!-- <header class="clearfix header">
-        <a href="javascript:;" class="return-button">
-            <i class="fa fa-chevron-left fa-lg memorandum"></i>
-            备忘录
-        </a>
-        <strong class="complete f_r" id="complete">完成</strong>
-    </header> -->
     <%- include('header') -%>
     <div class="content">
         <div id="notes">
             <ul class="notes-items" data-bind="foreach:notes.list">
                 <li class="notes-item">
-                    <!-- <span data-bind="text:"></span> -->
+                    <span data-bind="text:text"></span>
+                    <span data-bind="text:time"></span>
                 </li>
             </ul>
         </div>
@@ -76,24 +71,24 @@
     $('.return-button').click(function () {
         window.location="/register";   
     })
-    getNotes();
+    noteNotes();
     var notes;
     //获取个人所有备忘录文本
-    function getNotes() {
-        console.log(1);
+    function noteNotes() {
+        // console.log(1);
         $.ajax({
-            'url': '/getNotes',
+            'url': '/noteNotes',
             'type': 'get',
             'success': function (result) {
                 if (result) {
-                    console.log(result);
+                    console.log(result.text);
                     if (!notes) {
                         notes={
                             list: ko.observableArray()
                         };
                         ko.applyBindings(notes,document.getElementById("notes"));
                     }
-                    notes.list(result);
+                    notes.list(result.text);
                 } else{
                     // alert('错误！');
                 }
