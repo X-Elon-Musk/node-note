@@ -33,8 +33,11 @@
         <div id="notes">
             <ul class="notes-items" data-bind="foreach:notes.list">
                 <li class="notes-item">
-                    <span data-bind="text:text"></span>
-                    <span data-bind="text:time"></span>
+                    <div class="item-header"></div>
+                    <div class="item-content">
+                        <span data-bind="text:timeChange(time)"></span>
+                        <span data-bind="text:text"></span>
+                    </div>
                 </li>
             </ul>
         </div>
@@ -75,7 +78,6 @@
     var notes;
     //获取个人所有备忘录文本
     function noteNotes() {
-        // console.log(1);
         $.ajax({
             'url': '/noteNotes',
             'type': 'get',
@@ -90,12 +92,16 @@
                     }
                     notes.list(result.text);
                 } else{
-                    // alert('错误！');
+                    alert('错误！');
                 }
             }
         })
     }
-        
+    function timeChange(text) {
+        var content=text.replace(/([^\u0000-\u00FF])/g,'/')
+        return content;
+    }
+          
 </script>
 </body>
 </html>

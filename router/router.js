@@ -93,19 +93,15 @@ exports.notePages=function (req,res,next) {
 }
 //获取个人所有备忘录文本
 exports.noteNotes=function (req,res,next) {
-    // console.log('getNotes');
     var user_id=req.session.user_id;
     mysql.find(note_sql.getNotes,[user_id],function (err,result) {
-        // console.log(result[0].text,2222);
         if (err||result.length==0) {
             res.json('');
             return;         
         }
-
         var obj={
             'text': result
         };
-        // console.log(obj,333);
         res.json(obj);
     })
 }
