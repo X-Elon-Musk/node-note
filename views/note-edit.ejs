@@ -52,7 +52,6 @@
         if (content=='') {
             window.location='/notePages';          
         } else{
-            // console.log($('form').serialize());
             $.post('/record',{
                 'data': data
             },function (result) {

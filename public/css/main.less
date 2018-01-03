@@ -1,8 +1,12 @@
+.text-color(@color){
+    color: rgba(52, 73, 94, @color);
+}
 //公共样式
 .header{
     position: fixed;
     left: 0;
     top: 0;
+    z-index: 100;
     width: 100%;
     height: 2em;
     background-color: #fff;
@@ -26,6 +30,7 @@
     position: fixed;
     left: 0;
     bottom: 0;
+    z-index: 100;
     width: 100%;
     height: 2em;
     background-color: #fff;
@@ -34,6 +39,7 @@
     box-sizing: border-box; 
     line-height: 2em;
     color: #42b983;
+    text-align: center;
     i{
         font-size: 1em;
         line-height: 2em;
@@ -43,7 +49,16 @@
         color: #42b983;
         display: inline-block;
         height: 100%;
+        padding: 0 0.4em;
     }
+    .notes-number{
+        .text-color(1);
+        font-size: 0.6em;
+    }
+}
+.title{
+    padding: 0.2em 0; 
+    font-size: 2em;
 }
 //编辑页面
 .edit_page{
@@ -111,6 +126,50 @@
         padding-top: 1em;
         a{
             color: #34495e;
+        }
+    }
+}
+//首页
+.note-pages{
+    .notes-item{
+        position: relative;
+        width: 100%;
+        height: 55px;
+        padding: 4px 0; 
+        box-sizing: border-box;
+        border-bottom: 1px solid rgba(52, 73, 94, 0.2);
+        .item-container{
+            width: 100%;
+            // margin-left: -20px;
+            .item-title{
+                font-weight: bold;
+                width: 100%;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+                overflow: hidden;
+            }
+            .item-content{
+                font-size: 0.8em;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+                overflow: hidden;
+                .item-time{
+                    color: rgba(52, 73, 94, 0.8);
+                }
+                .item-text{
+                    color: rgba(52, 73, 94, 0.7);
+                }
+            }
+        }
+        .item-delete{
+            line-height: 2.8em;
+            height: 100%;
+            // width: 30px;
+            width: 0;
+            overflow: hidden;
+            background: #f66;
+            color: #fff;
+            text-align: center;
         }
     }
 }

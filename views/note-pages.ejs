@@ -4,7 +4,8 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
-    <title>node-note</title>
+    <title>备忘录</title>
+    <link rel="icon" href="/images/favicon.ico">
     <link href="/css/bootstrap.min.css" rel="stylesheet"/>
     <link href="/css/reset.less" rel="stylesheet/less"/>
     <link href="/css/main.less" rel="stylesheet/less"/>
@@ -27,23 +28,53 @@
 </head>
 <body>
 
-<div class="container home">
+<div class="container note-pages" id="notes">
     <%- include('header') -%>
     <div class="content">
-        <div id="notes">
-            <ul class="notes-items" data-bind="foreach:notes.list">
-                <li class="notes-item">
-                    <div class="item-header"></div>
-                    <div class="item-content">
-                        <span data-bind="text:timeChange(time)"></span>
-                        <span data-bind="text:text"></span>
+        <h1 class="title">备忘录</h1>
+        <div class="notes">
+            <!-- <ul class="notes-items" data-bind="foreach:notes.list">
+                <li class="notes-item clearfix" data-bind="attr:{id:id}">
+                    <div class="item-container f_l" data-bind="event:{touchstart: notes.actionStart,touchmove: notes.actionMove,touchend: notes.actionEnd}">
+                        <div class="item-title">
+                            <span data-bind="text:noteAnalyze(text).title"></span>
+                        </div>
+                        <div class="item-content">
+                            <span data-bind="text:timeChange(time)" class="item-time"></span>
+                            <span data-bind="text:noteAnalyze(text).content" class="item-text"></span>
+                        </div>
+                    </div>
+                    <div class="item-delete f_l">
+                        <i class="fa fa-trash fa-lg"></i>
+                    </div>
+                </li>
+            </ul> -->
+            <ul class="notes-items" data-bind="foreach:{data: notes}">
+                <li class="notes-item clearfix">
+                    <div class="item-container f_l" data-bind="event: {touchstart: $root.actionStart,touchmove: $root.actionMove,touchend: $root.actionEnd}">
+                        <div class="item-title">
+                            <span data-bind="text:noteAnalyze(text).title"></span>
+                        </div>
+                        <div class="item-content">
+                            <span data-bind="text:timeChange(time)" class="item-time"></span>
+                            <span data-bind="text:noteAnalyze(text).content" class="item-text"></span>
+                        </div>
+                    </div>
+                    <div class="item-delete f_l">
+                        <i class="fa fa-trash fa-lg"></i>
                     </div>
                 </li>
             </ul>
         </div>
     </div>
-    <%- include('footer') -%>
-    
+    <div class="footer clearfix">
+        <span class="notes-number">
+            <strong data-bind="text:notes().length"></strong>个备忘录
+        </span>
+        <a href="/noteEdit" class="f_r edit" id="edit">
+            <i class="fa fa-edit fa-lg"></i>
+        </a>
+    </div>
 </div>
 
 
@@ -83,25 +114,111 @@
             'type': 'get',
             'success': function (result) {
                 if (result) {
-                    console.log(result.text);
-                    if (!notes) {
+                    /*if (!notes) {
                         notes={
-                            list: ko.observableArray()
+                            list: ko.observableArray(),
+                            length: ko.observable(),
+                            actionStart: function (event) {
+                                console.log(event.currentTarget,this);
+                            },
+                            actionMove: function (event) {
+                                console.log(2);
+                            },
+                            actionEnd: function () {
+                                console.log(3);
+                            }  
                         };
                         ko.applyBindings(notes,document.getElementById("notes"));
                     }
                     notes.list(result.text);
+                    notes.length(result.text.length);*/
+                    var vm=new ViewModel(result.text);
+                    // vm=result.text;
+                    ko.applyBindings(vm);
+                    // console.log(result);
                 } else{
-                    alert('错误！');
+                    // alert('错误！');
                 }
             }
         })
     }
+    //时间格式修改
     function timeChange(text) {
         var content=text.replace(/([^\u0000-\u00FF])/g,'/')
         return content;
     }
+    //获得备忘笔记的头部和内容部分
+    function noteAnalyze(text) {
+        var obj={};
+        var arr=text.split('\r\n');
+        if (arr[0].length>=20) {
+            obj.title=text.substring(0,19);
+            obj.content=text.substring(20);      
+        } else{
+            obj.title=arr[0];
+            obj.content=text.substring(arr[0].length); 
+        }
+        return obj;
+    }
+   /* //定义notes数据对象
+    function NotesViewModel(list,length) {
+        var self=this;
+        self.list=ko.observableArray(list);
+        // self.length=ko.observable(length);
+    }*/
+    //定义ViewModel
+    function ViewModel(result) {
+        var self=this;
+        self.pageX=0;
+        self.disX=0;
+        self.initialLeft=0;
+        self.finalLeft=0;
+        self.target=null;
+        self.notes=ko.observableArray(result);
+        //手指接触到备忘笔记
+        self.actionStart=function (element,index,data) {
+            // console.log(event.currentTarget);
+            self.target=target=$(event.currentTarget);
+            self.pageX=event.touches[0].pageX;
+            self.initialLeft=parseFloat(target.css('marginLeft'));
+            // console.log(self.pageX);
+            // console.log(element);
+            // console.log(this);
+        };
+        //手指滑动备忘笔记
+        self.actionMove=function (element,index,data) {
+            
+            // var left=target.css('marginLeft');
+            // console.log(left);
+            self.disX=event.touches[0].pageX-self.pageX;
+            self.finalLeft=self.disX+self.initialLeft;
+            var target=self.target,left=self.finalLeft; 
+            // console.log(event.currentTarget);
+            if (left>0||left<=-target.next().height()) {
+                return;          
+            }
+            target.css({
+                'margin-left': left+'px'
+            })
+            target.next().css({
+                'width': Math.abs(left)+'px'
+            })
+        };
+        //手指离开备忘笔记
+        self.actionEnd=function () {
+            var maxWidth=self.target.next().height();
+            var left=Math.abs(self.finalLeft);
+            if (left>0&&left<maxWidth/2) {
+                self.target.animate({'margin-left':'0'},'fast');       
+                self.target.next().animate({'width':'0'},'fast');       
+            } else if(left>=maxWidth/2&&left<maxWidth){
+                self.target.animate({'margin-left':-maxWidth+'px'},'fast');       
+                self.target.next().animate({'width':maxWidth+'px'},'fast');   
+            }
+        }
+    }
           
+              
 </script>
 </body>
 </html>

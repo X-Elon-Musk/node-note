@@ -35,12 +35,5 @@ app.get('/noteEdit',router.noteEdit);
 //发表备忘记录
 app.post('/record',router.record);
 
-/*
-//注册
-app.post('/doRegister',router.doRegister);
-
-//发表记录
-app.post('/record',router.record); 
-*/
 
 app.listen(3100);

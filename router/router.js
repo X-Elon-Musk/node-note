@@ -108,7 +108,7 @@ exports.noteNotes=function (req,res,next) {
 //显示编辑页面
 exports.noteEdit=function (req,res,next) {
     res.render('note-edit',{
-        'active': 'edit',
+        'active': 'note-edit',
         'login': req.session.login,
         'username': req.session.username,
         'notetime': getNowFormatDate(new Date())
