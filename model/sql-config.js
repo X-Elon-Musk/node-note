@@ -39,3 +39,15 @@ exports.find=function (sql,params,callback) {
 	})
 	// connection.end();
 }
+//删除信息
+exports.delete=function (sql,params,callback) {
+	connection.query(sql,params,function (err,result) {
+		if (err) {
+			callback(err,null);
+			return;
+		} else{
+			callback(null,result);
+		}		
+	})
+	// connection.end();
+}

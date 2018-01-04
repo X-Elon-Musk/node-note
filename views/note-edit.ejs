@@ -55,6 +55,7 @@
             $.post('/record',{
                 'data': data
             },function (result) {
+                console.log(result);
                 if (result=='1') {
                     window.location='/notePages';
                 } else if(result=='-3'){

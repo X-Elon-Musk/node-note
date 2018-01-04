@@ -14,7 +14,8 @@ var user_sql={
 var note_sql={
     insert: 'insert into notes(user_id,text,time) values(?,?,?)',
     queryAll: 'select * from notes',
-    getNotes: 'select * from notes where user_id=?'
+    getNotes: 'select * from notes where user_id=?',
+    delete: 'delete from notes where id=?'
 }
 
 //显示首页
@@ -123,7 +124,7 @@ exports.noteEdit=function (req,res,next) {
     }
 }
 //发表备忘记录
-exports.record= function (req,res,next) {
+exports.record=function (req,res,next) {
     /*var user_id='';
     if (req.session.login!='1') {
         res.end('请登录。');
@@ -137,7 +138,7 @@ exports.record= function (req,res,next) {
         var arr=data.split('&');
         var time=arr[0].split('=')[1];
         var text=arr[1].split('=')[1];
-        console.log(data.split('&'));
+        // console.log(data.split('&'));
         mysql.insertOne(note_sql.insert,[req.session.user_id,text,time],function (err,result) {
             if (err) {
                 res.send('-3');
@@ -148,7 +149,21 @@ exports.record= function (req,res,next) {
     }) 
 }
 
-
+//删除单条备忘记录
+exports.delete=function (req,res,next) {
+    var form=new formidable.IncomingForm();
+    form.parse(req,function (err,fields,files) {
+        var id=fields.id;
+        mysql.delete(note_sql.delete,[id],function (err,result) {
+            if (err) {
+                res.send('-3');
+                return;         
+            }
+            res.send('1');//删除成功 
+        })
+    })
+}
+    
 
 
 
