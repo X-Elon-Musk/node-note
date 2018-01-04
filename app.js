@@ -31,9 +31,9 @@ app.get('/notePages',router.notePages);
 //获取个人所有备忘录文本
 app.get('/noteNotes',router.noteNotes);
 //显示编辑页面
-app.get('/noteEdit',router.noteEdit);
+app.get('/noteEdit/:id',router.noteEdit);
 //发表备忘记录
-app.post('/record',router.record);
+app.post('/record/:id',router.record);
 //删除单条备忘记录
 app.post('/delete',router.delete);
 

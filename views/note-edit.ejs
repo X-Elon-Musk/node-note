@@ -10,12 +10,13 @@
     <link href="/css/main.less" rel="stylesheet/less"/>
     <link rel="stylesheet" href="/font-awesome/css/font-awesome.min.css">
     <script src="/js/less.js" type="text/javascript" charset="utf-8"></script>
+    <script src="/js/jquery-1.11.3.min.js"></script>
 </head>
 <body>
 
 <div class="container edit_page">
     <header class="clearfix header">
-        <a href="javascript:;" class="return-button">
+        <a href="javascript:;" class="return-button" id="<%=id%>">
             <i class="fa fa-chevron-left fa-lg memorandum"></i>
             备忘录
         </a>
@@ -27,7 +28,7 @@
                 <%=notetime%>
             </div>
             <input type="hidden" value="<%=notetime%>" name="time">
-            <textarea class="form-control text" rows="3" name="content"></textarea>
+            <textarea class="form-control text" rows="3" name="content"><%=text%></textarea>
         </form>
     </div>
     <div class="footer clearfix">
@@ -42,17 +43,18 @@
 
 
 
-<script src="js/jquery-1.11.3.min.js"></script>
+
 
 <script type="text/javascript">
     //返回备忘录列表
     $('.return-button').click(function () {
-        var content=$('.text').val();
+        var text=$('.text').val()
+            id=$(this).attr('id');
         var data=decodeURIComponent($('form').serialize(),true);
-        if (content=='') {
+        if (text=='') {
             window.location='/notePages';          
         } else{
-            $.post('/record',{
+            $.post('/record/'+id,{
                 'data': data
             },function (result) {
                 console.log(result);

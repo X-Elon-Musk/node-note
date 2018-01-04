@@ -15,7 +15,9 @@ var note_sql={
     insert: 'insert into notes(user_id,text,time) values(?,?,?)',
     queryAll: 'select * from notes',
     getNotes: 'select * from notes where user_id=?',
-    delete: 'delete from notes where id=?'
+    getNoteByid: 'select * from notes where id=?',
+    delete: 'delete from notes where id=?',
+    updateNote: 'update notes set time=?,text=? where id=?'
 }
 
 //显示首页
@@ -106,31 +108,47 @@ exports.noteNotes=function (req,res,next) {
         res.json(obj);
     })
 }
-//显示编辑页面
+//显示编辑页面(在无内容和有内容情况下，渲染页面)
 exports.noteEdit=function (req,res,next) {
-    res.render('note-edit',{
-        'active': 'note-edit',
-        'login': req.session.login,
-        'username': req.session.username,
-        'notetime': getNowFormatDate(new Date())
-    })
-    function getNowFormatDate(date) {
+    var id=req.params['id'];
+    if (id) {
+        mysql.find(note_sql.getNoteByid,[id],function (err,result) {
+            res.render('note-edit',{
+                'active': 'note-edit',
+                'login': req.session.login,
+                'username': req.session.username,
+                'id': result[0].id,
+                'notetime': result[0].time,
+                'text': result[0].text
+            }) 
+        })      
+    } else{
+        res.render('note-edit',{
+            'active': 'note-edit',
+            'login': req.session.login,
+            'username': req.session.username,
+            'id': '',
+            'notetime': getNowFormatDate(new Date()),
+            'text': ''
+        }) 
+    }
+    /*function getNowFormatDate(date) {
         var seperator=":";
         var year=date.getFullYear();
         var month=date.getMonth()+1;
         var day=date.getDate();
         var currentdate=year+"年"+month+"月"+day+"日"+date.getHours()+seperator+date.getMinutes();
         return currentdate;
-    }
+    }*/
 }
-//发表备忘记录
+//发表备忘记录。原来有内容的时候为update数据库，没内容的时候为insert数据库。
 exports.record=function (req,res,next) {
     /*var user_id='';
     if (req.session.login!='1') {
         res.end('请登录。');
         return;
     }*/
-    
+    var id=req.params['id'];
     var form=new formidable.IncomingForm();
     form.parse(req, function (err,fields,files) {
         //存入user_id、text、time
@@ -138,14 +156,24 @@ exports.record=function (req,res,next) {
         var arr=data.split('&');
         var time=arr[0].split('=')[1];
         var text=arr[1].split('=')[1];
-        // console.log(data.split('&'));
-        mysql.insertOne(note_sql.insert,[req.session.user_id,text,time],function (err,result) {
-            if (err) {
-                res.send('-3');
-                return;         
-            }
-            res.send('1');//发表成功
-        })
+        if (id) {
+            time=getNowFormatDate(new Date());
+            mysql.update(note_sql.updateNote,[time,text,id],function (err,result) {
+                if (err) {
+                    res.send('-3');
+                    return;         
+                }
+                res.send('1');//更改成功
+            })       
+        } else{
+            mysql.insertOne(note_sql.insert,[req.session.user_id,text,time],function (err,result) {
+                if (err) {
+                    res.send('-3');
+                    return;         
+                }
+                res.send('1');//发表成功
+            })
+        }
     }) 
 }
 
@@ -164,8 +192,15 @@ exports.delete=function (req,res,next) {
     })
 }
     
-
-
+//获取当前时间
+function getNowFormatDate(date) {
+    var seperator=":";
+    var year=date.getFullYear();
+    var month=date.getMonth()+1;
+    var day=date.getDate();
+    var currentdate=year+"年"+month+"月"+day+"日"+date.getHours()+seperator+date.getMinutes();
+    return currentdate;
+}
 
 
 

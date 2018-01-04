@@ -41,6 +41,7 @@
             <ul class="notes-items" data-bind="foreach:{data: notes}">
                 <li class="notes-item clearfix" data-bind="attr:{id:id}">
                     <div class="item-container f_l" data-bind="event: {touchstart: $root.actionStart,touchmove: $root.actionMove,touchend: $root.actionEnd}">
+                    <!-- <div class="item-container f_l" data-bind="event: {click: $root.actionClick}"> -->
                         <div class="item-title">
                             <span data-bind="text:noteAnalyze(text).title"></span>
                         </div>
@@ -82,18 +83,10 @@
             }  */    
         })   
     })
-    //编辑
-    $('#edit').click(function () {
-        $('.text').focus();  
-    })
-    //退出编辑
-    $('#complete').click(function () {
-        $('.text').blur();  
-    })
-    //返回备忘录列表
+    /*//返回备忘录列表
     $('.return-button').click(function () {
         window.location="/register";   
-    })
+    })*/
     noteNotes();
     var notes;
     //获取个人所有备忘录文本
@@ -132,14 +125,61 @@
     //定义ViewModel
     function ViewModel(result) {
         var self=this;
+        /*var click=1,
+            time={
+                a:'',
+                b:''
+            };*/
+        var number=0,click=true;
         self.pageX=0;
         self.disX=0;
         self.notes=ko.observableArray(result);
-        //手指接触到备忘笔记
-        self.actionStart=function (element,index,data) {
+        //单击备忘笔记，滑动备忘笔记  
+        self.actionClick=function (event) {
+            self.pageX=0;
+            self.disX=0;
             moveBack(event.currentTarget);
             var target=$(event.currentTarget);
             self.pageX=event.touches[0].pageX;
+        }; 
+        //双击备忘笔记，进入编辑页面 
+        self.actionDblclick=function (event) {
+            // console.log(event.currentTarget);
+            var element=$(event.currentTarget).parent(),
+                id=element.attr('id');
+            /*$.post('/delete',{
+                'id': id
+            },function (result) {
+                if (result==1) {
+                    var number=parseFloat($('#number').html());
+                    element.remove();
+                    $('#number').html(--number); 
+                } else{
+                    return;
+                }
+            })*/
+            window.location="/noteEdit/"+id; 
+        }; 
+        //手指接触到备忘笔记,双击和单击处理
+        self.actionStart=function (element,index,data) {
+            /*self.pageX=0;
+            self.disX=0;
+            moveBack(event.currentTarget);
+            var target=$(event.currentTarget);
+            self.pageX=event.touches[0].pageX;*/
+            if(click){
+                setTimeout(function(){      
+                    number=0;
+                    click=true;
+                },400);
+                click=false;
+            }
+            number++;
+            if(number>=2){
+                self.actionDblclick(event);
+            } else{
+                self.actionClick(event);
+            }
         };
         //手指滑动备忘笔记
         self.actionMove=function (element,index,data) {
@@ -164,6 +204,7 @@
             var target=$(event.currentTarget),
                 maxWidth=target.next().height(),
                 left=Math.abs(self.disX);
+            // console.log(left);
             //没有移动超过方块最大宽度一半或者原来是打开状态时，关闭删除部分；超过方块最大宽度一半且小于等于最大宽度时，打开删除部分
             if ((left>0&&left<maxWidth/2)||target[0].back==true) {
                 target.removeClass('active').animate({'margin-left':'0'},'fast',function () {
@@ -178,7 +219,7 @@
                 target.next().animate({'width':maxWidth+'px'},'fast');
                 actionEdit(true);
             }
-        }
+        }; 
         //点击删除备忘笔记
         self.actionDelete=function () {
             var element=$(event.currentTarget).parent(),
@@ -194,7 +235,7 @@
                     return;
                 }
             })
-        }   
+        };
     }
     //备忘录都移动会原来位置，排除当前已经点击的对象
     function moveBack(now) {
@@ -225,7 +266,7 @@
     //头部编辑按钮操作
     function editActive() {
         $('.edit-items.edit-active').click(function () {
-            console.log(2);
+            // console.log(2);
         })
     }
         
