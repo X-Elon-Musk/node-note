@@ -20,6 +20,7 @@ time, mark, audio, video {
 }
 
 body {
+    font-size: 16px!important;
     line-height:1;
     font-family: "Helvetica Neue", Arial, sans-serif;
 }
@@ -95,10 +96,6 @@ hr {
 input, select {
     vertical-align:middle;
 }
-body{
-    padding: 0;
-    margin: 0;
-}
 ul,li{
     list-style: none;
     padding: 0;
@@ -107,30 +104,10 @@ ul,li{
 strong{
     font-weight: normal;
 }
-/*定义滚动条高宽及背景 高宽分别对应横竖滚动条的尺寸*/  
 ::-webkit-scrollbar  
-{  
-    width: 1px;  
-    height: 1px;  
-    background-color: rgba(0,0,0,0.3);  
-}  
-  
-/*定义滚动条轨道 内阴影+圆角*/  
-::-webkit-scrollbar-track  
-{  
-    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.2);  
-    border-radius: 10px;  
-    // background-color: #F5F5F5;  
-    background-color: #fff;  
-}  
-  
-/*定义滑块 内阴影+圆角*/  
-::-webkit-scrollbar-thumb  
-{  
-    border-radius: 10px;  
-    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);  
-    background-color: rgba(0,0,0,0.1);  
-}  
+{ 
+    display: none!important; 
+}   
 /* 公共样式 */
 body {
     font-family:  "Helvetica Neue", Arial, sans-serif;
@@ -139,9 +116,10 @@ body {
     -moz-osx-font-smoothing: grayscale;
     color: #34495e!important;
     background-color: #fff;
-    margin: 0;
     word-spacing: 0.05em;
     line-height: 1.6em;
+    padding: 0;
+    margin: 0;
 }
 .clearfix:after {
     content: " ";

@@ -40,8 +40,8 @@
         <div class="notes">
             <ul class="notes-items" data-bind="foreach:{data: notes}">
                 <li class="notes-item clearfix" data-bind="attr:{id:id}">
-                    <div class="item-container f_l" data-bind="event: {touchstart: $root.actionStart,touchmove: $root.actionMove,touchend: $root.actionEnd}">
-                    <!-- <div class="item-container f_l" data-bind="event: {click: $root.actionClick}"> -->
+                    <!-- <div class="item-container f_l" data-bind="event: {touchstart: $root.actionStart,touchmove: $root.actionMove,touchend: $root.actionEnd}"> -->
+                    <div class="item-container f_l" data-bind="event:{click: $root.actionClick}">
                         <div class="item-title">
                             <span data-bind="text:noteAnalyze(text).title"></span>
                         </div>
@@ -133,14 +133,23 @@
         var number=0,click=true;
         self.pageX=0;
         self.disX=0;
+        self.pageY=0;
+        self.disY=0;
         self.notes=ko.observableArray(result);
+        self.actionClick=function () {
+            
+        }
+            
         //单击备忘笔记，滑动备忘笔记  
         self.actionClick=function (event) {
             self.pageX=0;
             self.disX=0;
+            self.pageY=0;
+            self.disY=0;
             moveBack(event.currentTarget);
             var target=$(event.currentTarget);
             self.pageX=event.touches[0].pageX;
+            self.pageY=event.touches[0].pageY;
         }; 
         //双击备忘笔记，进入编辑页面 
         self.actionDblclick=function (event) {
@@ -162,12 +171,16 @@
         }; 
         //手指接触到备忘笔记,双击和单击处理
         self.actionStart=function (element,index,data) {
-            /*self.pageX=0;
+            self.pageX=0;
             self.disX=0;
-            moveBack(event.currentTarget);
+            self.pageY=0;
+            self.disY=0;
+            // moveBack(event.currentTarget);
             var target=$(event.currentTarget);
-            self.pageX=event.touches[0].pageX;*/
-            if(click){
+            self.pageX=event.touches[0].pageX;
+            self.pageY=event.touches[0].pageY;
+            // event.stopPropagation();
+            /*if(click){
                 setTimeout(function(){      
                     number=0;
                     click=true;
@@ -176,15 +189,27 @@
             }
             number++;
             if(number>=2){
+                // event.preventDefault();
                 self.actionDblclick(event);
             } else{
+                // event.preventDefault();
                 self.actionClick(event);
-            }
+            }*/
         };
         //手指滑动备忘笔记
         self.actionMove=function (element,index,data) {
+            // event.preventDefault();
             self.disX=event.touches[0].pageX-self.pageX;
-            var target=$(event.currentTarget),left=self.disX; 
+            self.disY=event.touches[0].pageY-self.pageY;
+            var x=self.disX,y=self.disY;
+            var w = x<0?x*-1:x;     //x轴的滑动值
+            var h = y<0?y*-1:y;     //y轴的滑动值
+            console.log(w,h);
+            if(w>h){ 
+                console.log(222);               //如果是在x轴中滑动
+                event.preventDefault();
+            }
+            /*var target=$(event.currentTarget),left=self.disX; 
             if (left>0) {
                 left=0; 
                 self.disX=0;        
@@ -197,11 +222,11 @@
             })
             target.next().css({
                 'width': Math.abs(left)+'px'
-            })
+            })*/
         };
         //手指离开备忘笔记
         self.actionEnd=function () {
-            var target=$(event.currentTarget),
+            /*var target=$(event.currentTarget),
                 maxWidth=target.next().height(),
                 left=Math.abs(self.disX);
             // console.log(left);
@@ -218,7 +243,7 @@
                 });       
                 target.next().animate({'width':maxWidth+'px'},'fast');
                 actionEdit(true);
-            }
+            }*/
         }; 
         //点击删除备忘笔记
         self.actionDelete=function () {

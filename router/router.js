@@ -111,6 +111,15 @@ exports.noteNotes=function (req,res,next) {
 //显示编辑页面(在无内容和有内容情况下，渲染页面)
 exports.noteEdit=function (req,res,next) {
     var id=req.params['id'];
+    // console.log(id);
+    /*res.render('note-edit',{
+        'active': 'note-edit',
+        'login': req.session.login,
+        'username': req.session.username,
+        'id': '',
+        'notetime': getNowFormatDate(new Date()),
+        'text': ''
+    })*/
     if (id) {
         mysql.find(note_sql.getNoteByid,[id],function (err,result) {
             res.render('note-edit',{
@@ -153,6 +162,7 @@ exports.record=function (req,res,next) {
     form.parse(req, function (err,fields,files) {
         //存入user_id、text、time
         var data=fields.data;
+        console.log(data);
         var arr=data.split('&');
         var time=arr[0].split('=')[1];
         var text=arr[1].split('=')[1];
