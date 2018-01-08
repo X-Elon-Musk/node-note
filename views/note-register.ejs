@@ -25,6 +25,12 @@
             <i class="fa fa-lock fa-lg label-icon"></i>
             <input type="password" class="form-control" id="password" placeholder="请输入密码">
         </div>
+        <div class="form-item clearfix">
+            <i class="fa fa-file-text-o fa-lg label-icon"></i>
+            <input type="text" class="form-control form-captcha" id="captcha" placeholder="请输入验证码">
+            <span class="svg"></span>
+            <i class="fa fa-repeat fa-lg label-icon svg-repeat"></i>
+        </div>
         <div class="prompt" role="alert">错误</div>
         <button type="button" class="btn btn-customized" id="submit">注册</button>
     </form>
@@ -32,6 +38,73 @@
 <script src="/js/jquery-1.11.3.min.js"></script>
 <!-- <script src="/js/bootstrap.min.js"></script> -->
 <script type="text/javascript">
+    /*getCode();
+    //获取验证码
+    function getCode() {
+        $.ajax({
+            'url': '/captcha',
+            'type': 'get',
+            'success': function (result) {
+                if (result) {
+                    $('.svg').html(result);
+                    var width=$('.svg').width()/$('.svg svg').width();
+                    var height=$('.svg').height()/$('.svg svg').height();
+                    $('.svg svg').css({
+                        transform: 'scale('+width+','+height+')'
+                    })
+                } 
+            }
+        })
+    }
+    $('.svg').click(function () {
+        getCode();
+    })*/
+    function Captcha(content) {
+        this.content=content;
+        this.init();
+    }
+    Captcha.prototype={
+        constructor: Captcha,
+        init: function () {
+            this.getCaptcha();
+            this.actions();
+        },
+        getCaptcha: function () {
+            var _this=this;
+            $.ajax({
+                'url': '/captcha',
+                'type': 'get',
+                'success': function (result) {
+                    if (result) {
+                        var content=$(_this.content);
+                        content.html(result);
+                        var svg=content.find('svg'),
+                            width=content.width()/svg.width(),
+                            height=content.height()/svg.height();
+                        svg.css({
+                            transform: 'scale('+width+','+height+')'
+                        })
+                    } 
+                }
+            })
+        },
+        change: function () {
+            this.getCaptcha();
+        },
+        actions: function () {
+            var content=this.content,
+                _this=this;
+            content.click(function () {
+                _this.change();
+            })
+            content.next('.svg-repeat').click(function () {
+                _this.change();
+            })
+        }
+                     
+    }
+    var captcha=new Captcha($('.svg'));   
+    //注册    
     $('#submit').click(function () {
         if ($('#username').val()=='') {
             $('.prompt').html('请填写用户名').css({
@@ -45,15 +118,28 @@
             });
             return;
         }
+        if ($('#captcha').val()=='') {
+            $('.prompt').html('请填写验证码').css({
+                'visibility': 'visible'
+            });
+            return;
+        }
         //注册
         $.post('/register',{
             'username': $('#username').val(),
-            'password': $('#password').val()
+            'password': $('#password').val(),
+            'captcha': $('#captcha').val()
         },function (result) {
             if (result=='1') {
                 window.location='/';
             } else if(result=='-1'){
-                $('.prompt').html('用户名被占用。').css({
+                $('.prompt').html('用户名被占用').css({
+                    'visibility': 'visible'
+                });
+            } else if(result=='-2'){
+                $('#captcha').val('');
+                captcha.getCaptcha();
+                $('.prompt').html('验证码错误').css({
                     'visibility': 'visible'
                 });
             }

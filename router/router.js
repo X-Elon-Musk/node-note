@@ -3,6 +3,7 @@ var path=require('path');
 var fs=require('fs');
 var mysql=require('../model/sql-config.js');
 var md5=require('../model/md5.js');
+var svgCaptcha = require('svg-captcha');
 
 var user_sql={
     insert: 'insert into users(login_name,password) values(?,?)',
@@ -64,6 +65,11 @@ exports.register=function (req,res,next) {
     form.parse(req,function (err,fields,files) {
         var username=fields.username;
         var password=fields.password;
+        var captcha=fields.captcha;
+        if (captcha!==req.session.captcha) {
+            res.send('-2');//验证码不对
+            return;            
+        }
         mysql.find(user_sql.getId,[username],function (err,result) {
             if (err) {
                 res.send('-3');//服务器错误
@@ -80,7 +86,7 @@ exports.register=function (req,res,next) {
                 if (err) {
                     res.send('-3');
                     return;                   
-                } 
+                }
                 req.session.username=username;
                 req.session.login='1';
                 res.send('1');//注册成功  
@@ -176,47 +182,6 @@ exports.record=function (req,res,next) {
 
 //删除单条备忘记录
 exports.delete=function (req,res,next) {
-    /*var id=req.params['id'];
-    //判断是哪种方式删除单条记录()
-    if (id) {
-        mysql.find(note_sql.deleteUpdate,[id],function (err,result0) {
-            if (err) {
-                res.send('-3');
-                return;         
-            }
-            //判断是否有下一行
-            if (result0.length!=0) {
-                renderDelete(res,result0[0].id);          
-            } else{
-                //没有下一行就显示数据库中第一行
-                mysql.find(note_sql.getTop,[],function (err,result1) {
-                    //判断第一行是否是要删除的那行
-                    if (result1[0].id==id) {
-                        mysql.delete(note_sql.delete,[id],function (err,result) {
-                            renderDelete(res,'');  
-                        })          
-                    } else{
-                        renderDelete(res,result1[0].id);
-                    }
-                }) 
-            }
-        })
-                  
-    } else{
-        var form=new formidable.IncomingForm();
-        form.parse(req,function (err,fields,files) {
-            var id=fields.id;
-            mysql.delete(note_sql.delete,[id],function (err,result) {
-                if (err) {
-                    res.send('-3');
-                    return;         
-                }
-                res.send('1');//删除成功 
-            })
-        })
-    }*/
-
-
     var id=req.params['id'];
     var form=new formidable.IncomingForm();
     form.parse(req,function (err,fields,files) {
@@ -264,6 +229,25 @@ exports.delete=function (req,res,next) {
         mysql.delete(note_sql.delete,[req.params['id']],function (err,result) {}) 
     }   
 }
+//获取验证码
+exports.captcha=function (req,res,next) {
+    var captcha = svgCaptcha.create({
+        noise: 3,
+        color: false,
+        background: '#d0f3e3'
+    });
+    req.session.captcha=captcha.text;
+    console.log(captcha.text);
+    res.type('html')
+    res.status(200).send(captcha.data);
+}
+
+
+
+
+
+
+
     
 //获取当前时间
 function getNowFormatDate(date) {
