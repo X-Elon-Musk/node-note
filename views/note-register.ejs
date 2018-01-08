@@ -38,27 +38,7 @@
 <script src="/js/jquery-1.11.3.min.js"></script>
 <!-- <script src="/js/bootstrap.min.js"></script> -->
 <script type="text/javascript">
-    /*getCode();
     //获取验证码
-    function getCode() {
-        $.ajax({
-            'url': '/captcha',
-            'type': 'get',
-            'success': function (result) {
-                if (result) {
-                    $('.svg').html(result);
-                    var width=$('.svg').width()/$('.svg svg').width();
-                    var height=$('.svg').height()/$('.svg svg').height();
-                    $('.svg svg').css({
-                        transform: 'scale('+width+','+height+')'
-                    })
-                } 
-            }
-        })
-    }
-    $('.svg').click(function () {
-        getCode();
-    })*/
     function Captcha(content) {
         this.content=content;
         this.init();
