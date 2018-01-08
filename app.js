@@ -35,7 +35,7 @@ app.get('/noteEdit/:id?',router.noteEdit);
 //发表备忘记录
 app.post('/record/:id?',router.record);
 //删除单条备忘记录
-app.post('/delete',router.delete);
+app.post('/delete/:id?',router.delete);
 
 
 app.listen(3100);

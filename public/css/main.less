@@ -44,6 +44,7 @@
         font-size: 1em;
         line-height: 2em;
         vertical-align: middle; 
+        padding: 0 0.4em;
     }
     a{
         color: #42b983;
@@ -61,7 +62,7 @@
     font-size: 2em;
 }
 //编辑页面
-.edit_page{
+.note-edit{
     .content{
         padding-top: 1em;
         height: auto;
@@ -87,6 +88,55 @@
             width: 100%;
             margin-top: 0;
         }
+        .mask{
+            position: fixed;
+            left: 0;
+            top: 0;
+            // z-index: -1;
+            z-index: 110;
+            height: 100%;
+            width: 100%;
+            // background: rgba(0,0,0,0.3);
+            // opacity: 0;
+            display: none;
+            // transition: all .5s cubic-bezier(.55,0,.1,1);
+            .mask-bg{
+                height: 100%;
+                width: 100%;
+                background: rgba(0,0,0,0.3);
+            }
+            .buttons{
+                position: absolute;
+                left: 0;
+                // bottom: 0;
+                bottom: -5em;
+                height: 5em;
+                width: 100%;
+                padding: 0 0.5em;
+                box-sizing: border-box;
+                .button{
+                    display: block;
+                    height: 2em;
+                    width: 100%;
+                    background: #fff;
+                    border-radius: 0.5em;
+                    margin-bottom: 0.5em;
+                    text-align: center;
+                    font-size: 1em;
+                    line-height: 2em;
+                }
+                .button-delete{
+                    color: #f66;
+                }
+                .button-cancel{
+                    color: #42b983;
+                }
+            }
+        }
+        /* .mask.active{
+            opacity: 1;
+            z-index: 110;
+        } */
     }
 }
 //首页、注册页面

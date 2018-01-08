@@ -15,8 +15,10 @@ var note_sql={
     insert: 'insert into notes(user_id,text,time) values(?,?,?)',
     queryAll: 'select * from notes',
     getNotes: 'select * from notes where user_id=?',
+    getTop: 'select * from notes limit 1',
     getNoteByid: 'select * from notes where id=?',
     delete: 'delete from notes where id=?',
+    deleteUpdate: 'select * from notes where id=(select min(id) from notes where id>?)',
     updateNote: 'update notes set time=?,text=? where id=?'
 }
 
@@ -111,25 +113,18 @@ exports.noteNotes=function (req,res,next) {
 //显示编辑页面(在无内容和有内容情况下，渲染页面)
 exports.noteEdit=function (req,res,next) {
     var id=req.params['id'];
-    // console.log(id);
-    /*res.render('note-edit',{
-        'active': 'note-edit',
-        'login': req.session.login,
-        'username': req.session.username,
-        'id': '',
-        'notetime': getNowFormatDate(new Date()),
-        'text': ''
-    })*/
     if (id) {
         mysql.find(note_sql.getNoteByid,[id],function (err,result) {
-            res.render('note-edit',{
-                'active': 'note-edit',
-                'login': req.session.login,
-                'username': req.session.username,
-                'id': result[0].id,
-                'notetime': result[0].time,
-                'text': result[0].text
-            }) 
+            if (result.length!==0) {
+                res.render('note-edit',{
+                    'active': 'note-edit',
+                    'login': req.session.login,
+                    'username': req.session.username,
+                    'id': result[0].id,
+                    'notetime': result[0].time,
+                    'text': result[0].text
+                })            
+            } 
         })      
     } else{
         res.render('note-edit',{
@@ -141,14 +136,6 @@ exports.noteEdit=function (req,res,next) {
             'text': ''
         }) 
     }
-    /*function getNowFormatDate(date) {
-        var seperator=":";
-        var year=date.getFullYear();
-        var month=date.getMonth()+1;
-        var day=date.getDate();
-        var currentdate=year+"年"+month+"月"+day+"日"+date.getHours()+seperator+date.getMinutes();
-        return currentdate;
-    }*/
 }
 //发表备忘记录。原来有内容的时候为update数据库，没内容的时候为insert数据库。
 exports.record=function (req,res,next) {
@@ -162,7 +149,7 @@ exports.record=function (req,res,next) {
     form.parse(req, function (err,fields,files) {
         //存入user_id、text、time
         var data=fields.data;
-        console.log(data);
+        // console.log(data);
         var arr=data.split('&');
         var time=arr[0].split('=')[1];
         var text=arr[1].split('=')[1];
@@ -189,17 +176,93 @@ exports.record=function (req,res,next) {
 
 //删除单条备忘记录
 exports.delete=function (req,res,next) {
-    var form=new formidable.IncomingForm();
-    form.parse(req,function (err,fields,files) {
-        var id=fields.id;
-        mysql.delete(note_sql.delete,[id],function (err,result) {
+    /*var id=req.params['id'];
+    //判断是哪种方式删除单条记录()
+    if (id) {
+        mysql.find(note_sql.deleteUpdate,[id],function (err,result0) {
             if (err) {
                 res.send('-3');
                 return;         
             }
-            res.send('1');//删除成功 
+            //判断是否有下一行
+            if (result0.length!=0) {
+                renderDelete(res,result0[0].id);          
+            } else{
+                //没有下一行就显示数据库中第一行
+                mysql.find(note_sql.getTop,[],function (err,result1) {
+                    //判断第一行是否是要删除的那行
+                    if (result1[0].id==id) {
+                        mysql.delete(note_sql.delete,[id],function (err,result) {
+                            renderDelete(res,'');  
+                        })          
+                    } else{
+                        renderDelete(res,result1[0].id);
+                    }
+                }) 
+            }
         })
+                  
+    } else{
+        var form=new formidable.IncomingForm();
+        form.parse(req,function (err,fields,files) {
+            var id=fields.id;
+            mysql.delete(note_sql.delete,[id],function (err,result) {
+                if (err) {
+                    res.send('-3');
+                    return;         
+                }
+                res.send('1');//删除成功 
+            })
+        })
+    }*/
+
+
+    var id=req.params['id'];
+    var form=new formidable.IncomingForm();
+    form.parse(req,function (err,fields,files) {
+        var follow=fields.follow;
+        //判断是否有后续操作(是否要显示下一条数据)
+        if (follow=='true') {
+            mysql.find(note_sql.deleteUpdate,[id],function (err,result0) {
+                if (err) {
+                    res.send('-3');
+                    return;         
+                }
+                //判断是否有下一行
+                if (result0.length!==0) {
+                    renderDelete(res,result0[0].id);          
+                } else{
+                    //没有下一行就显示数据库中第一行
+                    mysql.find(note_sql.getTop,[],function (err,result1) {
+                        //判断第一行是否是要删除的那行
+                        if (result1[0].id==id) {
+                            mysql.delete(note_sql.delete,[id],function (err,result) {
+                                renderDelete(res,'');  
+                            })          
+                        } else{
+                            renderDelete(res,result1[0].id);
+                        }
+                    }) 
+                }
+            })           
+        } else if(follow=='false'){
+            mysql.delete(note_sql.delete,[id],function (err,result) {
+                if (err) {
+                    res.send('-3');
+                    return;         
+                }
+                res.send('1');//删除成功 
+            })
+        }
     })
+    //返回查询数据，删除当前行
+    function renderDelete(res,new_id) {
+        res.send({
+            state: '1',
+            id: new_id 
+        });
+        mysql.delete(note_sql.delete,[req.params['id']],function (err,result) {}) 
+    }   
 }
     
 //获取当前时间

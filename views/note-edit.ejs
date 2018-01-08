@@ -15,7 +15,7 @@
 </head>
 <body>
 
-<div class="container edit_page">
+<div class="container note-edit">
     <header class="clearfix header">
         <a href="javascript:;" class="return-button" id="<%=id%>">
             <i class="fa fa-chevron-left fa-lg memorandum"></i>
@@ -31,6 +31,13 @@
             <input type="hidden" value="<%=notetime%>" name="time">
             <textarea class="form-control text" rows="3" name="content"><%=text%></textarea>
         </form>
+        <div class="mask">
+            <div class="mask-bg"></div>
+            <div class="buttons">
+                <span class="button button-delete">删除备忘录</span>
+                <span class="button button-cancel">取消</span>
+            </div>
+        </div>
     </div>
     <div class="footer clearfix">
         <span class="f_l trash">
@@ -41,10 +48,6 @@
         </span>
     </div>
 </div>
-
-
-
-
 
 <script type="text/javascript">
     //返回备忘录列表
@@ -58,7 +61,6 @@
             $.post('/record/'+id,{
                 'data': data
             },function (result) {
-                console.log(result);
                 if (result=='1') {
                     window.location='/notePages';
                 } else if(result=='-3'){
@@ -75,6 +77,79 @@
     $('#complete').click(function () {
         $('.text').blur();  
     })
+    //遮罩层
+    function Mask(content) {
+        this.content=content;
+        this.init();
+    }
+    Mask.prototype={
+        constructor: Mask,
+        init: function () {
+            this.bottom=$(this.content).find('.buttons').css('bottom'); 
+            this.actions(); 
+        },   
+        //关闭遮罩层 
+        close: function () {
+            $(this.content).fadeOut();
+        },
+        //打开遮罩层
+        open: function () {
+            $(this.content).fadeIn();
+        },
+        //按钮上下移动
+        buttonsMove: function (bottom,callback) {
+            $(this.content).find('.buttons').animate({
+                bottom: bottom
+            },'fast',function () {
+                callback&&callback();   
+            })
+        },
+        transfer: function () {
+            var id=$('.return-button').attr('id');
+            $.post('/delete/'+id,{
+                'follow': true
+            },function (result) {
+                //判断是否还有数据，没有数据直接重定向到空的编辑页面
+                if (result.state=='1') {
+                    if (result.id!='') {
+                        window.location="/noteEdit/"+result.id;          
+                    } else{
+                        window.location="/noteEdit/";
+                    }
+                }
+            },'json')  
+        },  
+        //删除备忘录
+        delete: function () {
+            var _this=this;
+            this.buttonsMove(_this.bottom,function () {
+                _this.close();  
+                _this.transfer(); 
+            });
+        },  
+        //遮罩层动作
+        actions: function () {
+            var _this=this;
+            $('.trash').click(function () {
+                _this.open();
+                _this.buttonsMove(0);
+            })
+            //取消
+            $(this.content).find('.button-cancel').click(function () {
+                _this.buttonsMove(_this.bottom,_this.close());
+            })
+            //点击遮罩层
+            $(this.content).find('.mask-bg').click(function () {
+                _this.buttonsMove(_this.bottom,_this.close());
+            })
+            //点击删除备忘录按钮
+            $(this.content).find('.button-delete').click(function () {
+                _this.delete();
+            })
+        }      
+    }
+    new Mask($('.mask'));
+        
 </script>
 </body>
 </html>
