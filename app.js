@@ -36,8 +36,10 @@ app.get('/noteEdit/:id?',router.noteEdit);
 app.post('/record/:id?',router.record);
 //删除单条备忘记录
 app.post('/delete/:id?',router.delete);
-//获取验证码
+//获取图片验证码
 app.get('/captcha',router.captcha);
+//获取手机验证码
+app.post('/teleCode',router.teleCode);
 
 
 

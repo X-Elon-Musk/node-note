@@ -4,11 +4,20 @@ var fs=require('fs');
 var mysql=require('../model/sql-config.js');
 var md5=require('../model/md5.js');
 var svgCaptcha = require('svg-captcha');
+const SMSClient = require('@alicloud/sms-sdk')
+// ACCESS_KEY_ID/ACCESS_KEY_SECRET 根据实际申请的账号信息进行替换
+const accessKeyId = 'LTAINkfU7xNmo0qb'
+const secretAccessKey = 'WNce8J1x0TQFkb57jYOnXW2xyM8pD7'
 
+
+
+
+//sql命令
 var user_sql={
     insert: 'insert into users(login_name,password) values(?,?)',
     queryAll: 'select * from users',
     getInfo: 'select * from users where login_name=?',
+    getUser: 'select * from users where telephone=?',
     getId: 'select id from users where login_name=?',
     getPassword: 'select password from users where login_name=?'
 }
@@ -31,28 +40,58 @@ exports.index=function (req,res,next) {
 exports.login=function (req,res,next) {
     var form=new formidable.IncomingForm();
     form.parse(req,function (err,fields,files) {
-        var username=fields.username;
-        var password=fields.password;
-        var password_md5=md5(md5(password)+'792884274');
-        mysql.find(user_sql.getInfo,[username],function (err,result) {
-            if (err) {
-                res.send('-3');//服务器错误
-                return;                   
-            }   
-            if (result.length==0) {
-                res.send('-1');//用户不存在
-                return;
-            }
-            if (password_md5==result[0].password) {
-                req.session.username=username;
-                req.session.user_id=result[0].id;
-                req.session.login='1';
-                res.send('1');//登录成功，写入session
-            } else{
-                res.send('-2');//密码错误
-                return;
-            }
-        })  
+        //判断是短信登录还是密码登录
+        var mode=fields.mode;
+        console.log(mode);
+        if (mode=='message') {
+            var telephone=fields.telephone;
+            var message=fields.message;
+            console.log('================');
+            mysql.find(user_sql.getUser,[telephone],function (err,result) {
+                if (err) {
+                    res.send('-3');//服务器错误
+                    return;                   
+                }   
+                if (result.length==0) {
+                    res.send('-1');//手机号未注册
+                    return;
+                }
+                // req.session.message='908370';
+                console.log(req.session.message);
+                if (message==req.session.message) {
+                    req.session.username=result[0].login_name;
+                    req.session.user_id=result[0].id;
+                    req.session.login='1';
+                    res.send('1');//登录成功，写入session
+                } else{
+                    res.send('-2');//验证码错误
+                    return;
+                }
+            })            
+        } else if(mode=='password'){
+            var username=fields.username;
+            var password=fields.password;
+            var password_md5=md5(md5(password)+'792884274');
+            mysql.find(user_sql.getInfo,[username],function (err,result) {
+                if (err) {
+                    res.send('-3');//服务器错误
+                    return;                   
+                }   
+                if (result.length==0) {
+                    res.send('-1');//用户不存在
+                    return;
+                }
+                if (password_md5==result[0].password) {
+                    req.session.username=username;
+                    req.session.user_id=result[0].id;
+                    req.session.login='1';
+                    res.send('1');//登录成功，写入session
+                } else{
+                    res.send('-2');//密码错误
+                    return;
+                }
+            })  
+        }
     })
 }
 //显示注册页面
@@ -229,7 +268,7 @@ exports.delete=function (req,res,next) {
         mysql.delete(note_sql.delete,[req.params['id']],function (err,result) {}) 
     }   
 }
-//获取验证码
+//获取图片验证码
 exports.captcha=function (req,res,next) {
     var captcha = svgCaptcha.create({
         noise: 3,
@@ -241,6 +280,42 @@ exports.captcha=function (req,res,next) {
     res.type('html')
     res.status(200).send(captcha.data);
 }
+//获取手机验证码
+exports.teleCode=function (req,res,next) {
+    var form=new formidable.IncomingForm();
+    form.parse(req,function (err,fields,files) {
+        var telephone=fields.telephone;
+        var message=createParam();
+        //初始化sms_client
+        let smsClient = new SMSClient({accessKeyId, secretAccessKey});
+        //发送短信
+        smsClient.sendSMS({
+            PhoneNumbers: telephone,
+            SignName: '李超',
+            TemplateCode: 'SMS_121165464',
+            TemplateParam: '{"code":'+message+'}'
+        }).then(function (res) {
+            let {Code}=res
+            if (Code === 'OK') {
+                /*//处理返回参数
+                console.log(res);*/
+                req.session.message=message;
+                res.send('1');//发送成功 
+            }
+        }, function (err) {
+            console.log('获取手机验证码错误:'+err);
+            return;
+        })
+    })
+    function createParam() {
+        var param='';
+        for (var i=0;i<6;i++) {
+            param+=Math.floor(Math.random()*10);
+        }  
+        return param;
+    }
+}
+    
 
 
 
