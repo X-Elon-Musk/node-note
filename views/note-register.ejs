@@ -7,8 +7,6 @@
     <link rel="icon" href="/images/favicon.ico">
     <title>注册</title>
     <link href="/css/bootstrap.min.css" rel="stylesheet">
-
-    <link rel="stylesheet/less" href="/css/github.less"/>
     <link rel="stylesheet/less" href="/css/reset.less"/>
     <link rel="stylesheet/less" href="/css/main.less"/>
     <link rel="stylesheet" href="/font-awesome/css/font-awesome.min.css">
@@ -16,18 +14,21 @@
 </head>
 <body>
 <div class="vs register login-register">
+    <div class="logo-container">
+        <img src="/images/logo.png" alt="" class="logo">
+    </div>
     <form>
         <div class="form-item clearfix">
             <i class="fa fa-user-circle-o fa-lg label-icon"></i>
-            <input type="text" class="form-control" id="username" placeholder="请输入用户名">
+            <input type="text" class="form-control" id="username" placeholder="用户名">
         </div>
         <div class="form-item clearfix">
             <i class="fa fa-lock fa-lg label-icon"></i>
-            <input type="password" class="form-control" id="password" placeholder="请输入密码">
+            <input type="password" class="form-control" id="password" placeholder="密码">
         </div>
         <div class="form-item clearfix">
             <i class="fa fa-file-text-o fa-lg label-icon"></i>
-            <input type="text" class="form-control form-captcha" id="captcha" placeholder="请输入验证码">
+            <input type="text" class="form-control form-captcha" id="captcha" placeholder="验证码">
             <span class="svg"></span>
             <i class="fa fa-repeat fa-lg label-icon svg-repeat"></i>
         </div>
@@ -110,6 +111,7 @@
             'password': $('#password').val(),
             'captcha': $('#captcha').val()
         },function (result) {
+            console.log('result:'+result);
             if (result=='1') {
                 window.location='/';
             } else if(result=='-1'){

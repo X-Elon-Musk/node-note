@@ -7,35 +7,170 @@
     <link rel="icon" href="/images/favicon.ico">
     <title>登录</title>
     <link href="/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet/less" href="/css/github.less"/>
     <link rel="stylesheet/less" href="/css/reset.less"/>
     <link rel="stylesheet/less" href="/css/main.less"/>
     <link rel="stylesheet" href="/font-awesome/css/font-awesome.min.css">
     <script src="/js/less.js" type="text/javascript" charset="utf-8"></script>
 </head>
 <body>
-<div class="vs home login-register">
-    <form>
-        <div class="form-item clearfix">
-            <i class="fa fa-user-circle-o fa-lg label-icon"></i>
-            <input type="text" class="form-control" id="username" placeholder="请输入用户名">
-        </div>
-        <div class="form-item clearfix">
-            <i class="fa fa-lock fa-lg label-icon"></i>
-            <input type="password" class="form-control" id="password" placeholder="请输入密码">
-        </div>
+<div class="vs home login login-register">
+    <div class="logo-container">
+        <img src="/images/logo.png" alt="" class="logo">
+    </div>
+    <div class="sign-in">
+        <ul class="modes-tabs">
+            <li class="tabs-item item-message active" mode="message">短信登录</li>
+            <li class="tabs-item item-password" mode="password">密码登录</li>
+        </ul>
+        <ul class="modes-forms">
+            <li class="forms-item">
+                <form>
+                    <div class="form-item clearfix">
+                        <i class="fa fa-phone fa-lg label-icon"></i>
+                        <input type="tel" class="form-control" maxlength="11" id="telephone" placeholder="手机号">
+                        <!-- <span class="get-code"></span> -->
+                        <button class="get-code" disabled="disabled">获取验证码</button>
+                    </div>
+                    <div class="form-item clearfix">
+                        <i class="fa fa-file-text-o fa-lg label-icon"></i>
+                        <input type="password" class="form-control" id="identifying-code" placeholder="验证码">
+                    </div>
+                </form>
+            </li>
+            <li class="forms-item">
+                <form>
+                    <div class="form-item clearfix">
+                        <i class="fa fa-user-circle-o fa-lg label-icon"></i>
+                        <input type="text" class="form-control" id="username" placeholder="用户名">
+                    </div>
+                    <div class="form-item clearfix">
+                        <i class="fa fa-lock fa-lg label-icon"></i>
+                        <input type="password" class="form-control" id="password" placeholder="密码">
+                    </div>
+                    <!-- <div class="prompt" role="alert">错误</div>
+                    <button type="button" class="btn btn-customized" id="submit">登录</button> -->
+                    
+                </form>
+            </li>
+        </ul>
         <div class="prompt" role="alert">错误</div>
         <button type="button" class="btn btn-customized" id="submit">登录</button>
         <div class="register">
             <a href="/noteRegister">没有账号，去注册</a>
         </div>
-    </form>
+    </div>
 </div>
 <script src="/js/jquery-1.11.3.min.js"></script>
 <script src="/js/bootstrap.min.js"></script>
 <!-- <script src="/js/common.js"></script> -->
 <script type="text/javascript">
-    $('#submit').click(function () {
+    //获取验证码
+    function SignIn() {
+        this.mode='message';
+        this.init();
+    }
+    SignIn.prototype={
+        constructor: SignIn,
+        init: function () {
+            this.tabsSwitch();
+            this.doSubmit();
+        },
+        //切换登录方式
+        tabsSwitch: function () {
+            var _this=this;
+            var tabs=$('.modes-tabs .tabs-item'),
+                forms=$('.modes-forms .forms-item');
+            tabs.each(function (index,element) {
+                $(this).click(function () {
+                    _this.mode=$(this).attr('mode');
+                    $('.prompt').html('').css({
+                        'visibility': 'hidden'
+                    });
+                    tabs.removeClass('active');
+                    $(this).addClass('active');
+                    forms.hide();
+                    forms.eq(index).show();
+                })   
+            })
+        },
+        doSubmit: function () {
+            var _this=this;
+            $('#submit').click(function () {
+                /*if ($('#username').val()=='') {
+                    $('.prompt').html('请填写用户名').css({
+                        'visibility': 'visible'
+                    });
+                    return;
+                }
+                if ($('#password').val()=='') {
+                    $('.prompt').html('请填写密码').css({
+                        'visibility': 'visible'
+                    });
+                    return;
+                }*/
+                if (_this.mode=='message') {
+                    var tele=_this.prompt('#telephone','请填写手机号');
+                    if (!tele) return;
+                    var code=_this.prompt('#identifying-code','请填写验证码');
+                    if (!code) return;
+                } else if(_this.mode=='password') {
+                    var user=_this.prompt('#username','请填写用户名');
+                    if (!user) return;
+                    var pass=_this.prompt('#password','请填写密码');
+                    if (!pass) return;
+                    _this.submitPassword();
+                }
+            })
+        },
+        
+        prompt: function (id,text) {
+            if ($(id).val()=='') {
+                $('.prompt').html(text).css({
+                    'visibility': 'visible'
+                });
+                return false;
+            }
+            return true;
+        },  
+        //短信登录
+        submitMessage: function () {
+            
+        },
+        //密码登录
+        submitPassword: function () {
+            $.post('/login',{
+                'username': $('#username').val(),
+                'password': $('#password').val()
+            },function (result) {
+                if (result=='1') {
+                    window.location='/notePages';
+                } else if(result=='-1'){
+                    $('.prompt').html('用户名不存在！').css({
+                        'visibility': 'visible'
+                    });
+                } else if(result=='-2'){
+                    $('.prompt').html('密码错误！').css({
+                        'visibility': 'visible'
+                    });
+                }
+            })
+        }   
+    }
+    new SignIn();
+    //切换登录方式
+    /*var tabs=$('.modes-tabs .tabs-item'),
+        forms=$('.modes-forms .forms-item');
+    tabs.each(function (index,element) {
+        $(this).click(function () {
+            tabs.removeClass('active');
+            $(this).addClass('active');
+            forms.hide();
+            forms.eq(index).show();
+        })   
+    })*/
+
+    //登录
+    /*$('#submit').click(function () {
         if ($('#username').val()=='') {
             $('.prompt').html('请填写用户名').css({
                 'visibility': 'visible'
@@ -65,7 +200,7 @@
                 });
             }
         })
-    })
+    })*/
 </script>
 </body>
 </html>

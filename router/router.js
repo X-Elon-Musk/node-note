@@ -66,7 +66,7 @@ exports.register=function (req,res,next) {
         var username=fields.username;
         var password=fields.password;
         var captcha=fields.captcha;
-        if (captcha!==req.session.captcha) {
+        if (captcha.toLowerCase()!==req.session.captcha.toLowerCase()) {
             res.send('-2');//验证码不对
             return;            
         }
