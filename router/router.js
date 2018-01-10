@@ -19,7 +19,8 @@ var user_sql={
     getInfo: 'select * from users where username=?',
     getUser: 'select * from users where telephone=?',
     getId: 'select id from users where username=?',
-    getPassword: 'select password from users where username=?'
+    getPassword: 'select password from users where username=?',
+    changeUsername: 'update users set username=? where id=?'
 }
 var note_sql={
     insert: 'insert into notes(user_id,text,time) values(?,?,?)',
@@ -157,16 +158,52 @@ exports.noteNotes=function (req,res,next) {
 }
 //获取用户信息页面
 exports.noteUser=function (req,res,next) {
-    var username=req.params['username'];
+    //没有登录
+    if (req.session.login!=='1') {
+        return;   
+    }
+    var username=req.session.username;
     mysql.find(user_sql.getInfo,[username],function (err,result) {
         if (err) {
             return;         
         }
         res.render('note-user',{
+            'id': result[0].id,
             'username': result[0].username,
             'telephone': result[0].telephone
         })
     })
+}
+//显示修改用户名页面
+exports.noteUsername=function (req,res,next) {
+    res.render('note-username',{})
+}
+//修改用户的用户名
+exports.noteChangeUsername=function (req,res,next) {
+    var user_id=req.session.user_id;
+    var form=new formidable.IncomingForm();
+    form.parse(req,function (err,fields,files) {
+        var username=fields.username;
+        if (username==req.session.username) {
+            res.send('2');//修改后的用户名和原用户名相同         
+        } else{
+            mysql.find(user_sql.getInfo,[username],function (err0,result0) {
+                if (err0) return;
+                if (result0.length!=0) {
+                    res.send('-1');//用户名被占用
+                    return;
+                }
+                mysql.update(user_sql.changeUsername,[username,user_id],function (err1,result1) {
+                    if (err1) {
+                        return;         
+                    } else{
+                        req.session.username=username;
+                        res.send('1');//用户名修改成功
+                    }
+                })
+            })
+        }
+    })  
 }
 //显示编辑页面(在无内容和有内容情况下，渲染页面)
 exports.noteEdit=function (req,res,next) {

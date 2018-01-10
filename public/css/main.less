@@ -19,6 +19,7 @@
         color: #42b983;
         display: inline-block;
         height: 100%;
+        padding: 0 0.4em;
         i{
             font-size: 1em;
             line-height: 2em;
@@ -142,6 +143,15 @@
         } */
     }
 }
+//错误提示
+.prompt{
+    height: 2em;
+    font-size: 12px;
+    line-height: 2em;
+    padding: 0;
+    color: red;
+    visibility: hidden;
+}
 //首页、注册页面
 .login-register{
     width: 100%;
@@ -180,14 +190,6 @@
             box-sizing: border-box;
             padding: 0 1em;
         }
-    }
-    .prompt{
-        height: 2em;
-        font-size: 12px;
-        line-height: 2em;
-        padding: 0;
-        color: red;
-        visibility: hidden;
     }
     .btn-customized{
         margin-top: 0;
@@ -326,5 +328,70 @@
             color: #fff;
             text-align: center;
         }
+    }
+}
+.note-info{
+    .header{
+        text-align: center;
+        .header-text{
+            display: inline-block;
+            height: 100%;
+            line-height: 2em;
+            font-weight: bold;
+        }
+    }
+    .content{
+        padding-top: 1em;
+    }
+}
+//用户信息页面
+.note-user{
+    .header{
+        text-align: center;
+        .header-text{
+            display: inline-block;
+            height: 100%;
+            line-height: 2em;
+            font-weight: bold;
+        }
+    }
+    .content{
+        // padding-top: 1em;
+        .item-classify{
+            height: 1em;
+            line-height: 1em;
+            font-size: 20px;
+            padding: 0.4em 0;
+            box-sizing: content-box;
+            i,span{
+                font-size: 14px;
+                vertical-align: middle; 
+                color: #999;
+            }
+        }
+        .info-item{
+            width: 100%;
+            height: 3em;
+            padding: 0;
+            line-height: 3em;
+            box-sizing: border-box;
+            border-bottom: 1px solid rgba(52, 73, 94,0.2);
+            a{
+                display: inline-block;
+                height: 100%;
+                width: 100%;
+                color: #34495e;
+            }
+            .item-content{
+                height: 100%;
+                line-height: 3em;
+            }
+        }
+    }
+}
+//修改用户名页面
+.note-username{
+    .btn-customized{
+        margin-top: 0;
     }
 }
