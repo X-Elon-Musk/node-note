@@ -36,6 +36,10 @@ app.get('/noteUser',router.noteUser);
 app.get('/noteUsername',router.noteUsername);
 //修改用户的用户名
 app.post('/noteChangeUsername',router.noteChangeUsername);
+//显示修改用户密码页面
+app.get('/notePassword',router.notePassword);
+//修改用户的密码
+app.post('/noteChangePassword',router.noteChangePassword);
 //显示编辑页面
 app.get('/noteEdit/:id?',router.noteEdit);
 //发表备忘记录

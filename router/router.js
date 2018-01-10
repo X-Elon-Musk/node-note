@@ -17,10 +17,12 @@ var user_sql={
     insert: 'insert into users(username,password) values(?,?)',
     queryAll: 'select * from users',
     getInfo: 'select * from users where username=?',
+    getInfoById: 'select * from users where id=?',
     getUser: 'select * from users where telephone=?',
     getId: 'select id from users where username=?',
     getPassword: 'select password from users where username=?',
-    changeUsername: 'update users set username=? where id=?'
+    changeUsername: 'update users set username=? where id=?',
+    changePassword: 'update users set password=? where id=?'
 }
 var note_sql={
     insert: 'insert into notes(user_id,text,time) values(?,?,?)',
@@ -159,6 +161,7 @@ exports.noteNotes=function (req,res,next) {
 //获取用户信息页面
 exports.noteUser=function (req,res,next) {
     //没有登录
+    // console.log('&&&&&&&&&&&&&&&:'+req.session.username);
     if (req.session.login!=='1') {
         return;   
     }
@@ -167,6 +170,7 @@ exports.noteUser=function (req,res,next) {
         if (err) {
             return;         
         }
+        // console.log(result[0].id);
         res.render('note-user',{
             'id': result[0].id,
             'username': result[0].username,
@@ -203,6 +207,33 @@ exports.noteChangeUsername=function (req,res,next) {
                 })
             })
         }
+    })  
+}
+//显示修改用户密码页面
+exports.notePassword=function (req,res,next) {
+    res.render('note-password',{})
+}
+//修改用户的密码
+exports.noteChangePassword=function (req,res,next) {
+    var user_id=req.session.user_id;
+    var form=new formidable.IncomingForm();
+    form.parse(req,function (err,fields,files) {
+        var password=md5(md5(fields.password)+'792884274');;
+        mysql.find(user_sql.getInfoById,[user_id],function (err0,result0) {
+            if (err0) return;
+            if (result0[0].password==password) {
+                res.send('2');//修改后的密码和原密码相同         
+                return;
+            }
+            mysql.update(user_sql.changePassword,[password,user_id],function (err1,result1) {
+                if (err1) {
+                    return;         
+                } else{
+                    res.send('1');//密码修改成功
+                }
+            })
+        })
+
     })  
 }
 //显示编辑页面(在无内容和有内容情况下，渲染页面)
@@ -326,7 +357,7 @@ exports.captcha=function (req,res,next) {
         background: '#d0f3e3'
     });
     req.session.captcha=captcha.text;
-    console.log(captcha.text);
+    // console.log(captcha.text);
     res.type('html')
     res.status(200).send(captcha.data);
 }
