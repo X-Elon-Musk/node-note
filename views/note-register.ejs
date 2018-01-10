@@ -19,7 +19,7 @@
     </div>
     <form>
         <div class="form-item clearfix">
-            <i class="fa fa-user-circle-o fa-lg label-icon"></i>
+            <i class="fa fa-user fa-lg label-icon"></i>
             <input type="text" class="form-control" id="username" placeholder="用户名">
         </div>
         <div class="form-item clearfix">
@@ -85,48 +85,69 @@
                      
     }
     var captcha=new Captcha($('.svg'));   
-    //注册    
-    $('#submit').click(function () {
-        if ($('#username').val()=='') {
-            $('.prompt').html('请填写用户名').css({
-                'visibility': 'visible'
-            });
-            return;
-        }
-        if ($('#password').val()=='') {
-            $('.prompt').html('请填写密码').css({
-                'visibility': 'visible'
-            });
-            return;
-        }
-        if ($('#captcha').val()=='') {
-            $('.prompt').html('请填写验证码').css({
-                'visibility': 'visible'
-            });
-            return;
-        }
+    //注册 
+    function Register() {
+        this.init();
+    }
+    Register.prototype={
+        constructor: Register,
+        init: function () {
+            this.doRegister();
+        },
         //注册
-        $.post('/register',{
-            'username': $('#username').val(),
-            'password': $('#password').val(),
-            'captcha': $('#captcha').val()
-        },function (result) {
-            console.log('result:'+result);
-            if (result=='1') {
-                window.location='/';
-            } else if(result=='-1'){
-                $('.prompt').html('用户名被占用').css({
-                    'visibility': 'visible'
-                });
-            } else if(result=='-2'){
-                $('#captcha').val('');
-                captcha.getCaptcha();
-                $('.prompt').html('验证码错误').css({
-                    'visibility': 'visible'
-                });
+        doRegister: function () {
+            var _this=this;
+            $('#submit').click(function () {
+                var user=_this.prompt('#username','请填写用户名');
+                if (!user) return;
+                var pass=_this.prompt('#password','请填写密码');
+                if (!pass) return; 
+                var cap=_this.prompt('#captcha','请填写验证码');
+                if (!cap) return;
+                _this.register();
+            })
+        },
+        //提示信息
+        prompt: function (id,text) {
+            var _this=this;
+            if ($(id).val()=='') {
+                _this.promptDom(text);
+                return false;
             }
-        })
-    })
+            return true;
+        }, 
+        //DOM元素prompt设定
+        promptDom: function (text,visible) {
+            if (!visible){
+                var visible='visible';
+            } 
+            $('.prompt').html(text).css({
+                'visibility': visible
+            });
+        }, 
+        //ajax请求后台注册
+        register: function () {
+            var _this=this;
+            $.post('/register',{
+                'username': $('#username').val(),
+                'password': $('#password').val(),
+                'captcha': $('#captcha').val()
+            },function (result) {
+                if (result=='1') {
+                    window.location='/';
+                } else if(result=='-1'){
+                    $('#captcha').val('');
+                    captcha.getCaptcha();
+                    _this.promptDom('用户名被占用');
+                } else if(result=='-2'){
+                    $('#captcha').val('');
+                    captcha.getCaptcha();
+                    _this.promptDom('验证码错误');
+                }
+            })
+        }     
+    }
+    new Register();    
 </script>
 </body>
 </html>

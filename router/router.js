@@ -14,12 +14,12 @@ const secretAccessKey = 'WNce8J1x0TQFkb57jYOnXW2xyM8pD7'
 
 //sql命令
 var user_sql={
-    insert: 'insert into users(login_name,password) values(?,?)',
+    insert: 'insert into users(username,password) values(?,?)',
     queryAll: 'select * from users',
-    getInfo: 'select * from users where login_name=?',
+    getInfo: 'select * from users where username=?',
     getUser: 'select * from users where telephone=?',
-    getId: 'select id from users where login_name=?',
-    getPassword: 'select password from users where login_name=?'
+    getId: 'select id from users where username=?',
+    getPassword: 'select password from users where username=?'
 }
 var note_sql={
     insert: 'insert into notes(user_id,text,time) values(?,?,?)',
@@ -46,7 +46,7 @@ exports.login=function (req,res,next) {
         if (mode=='message') {
             var telephone=fields.telephone;
             var message=fields.message;
-            console.log('================');
+            // console.log('================');
             mysql.find(user_sql.getUser,[telephone],function (err,result) {
                 if (err) {
                     res.send('-3');//服务器错误
@@ -57,9 +57,9 @@ exports.login=function (req,res,next) {
                     return;
                 }
                 // req.session.message='908370';
-                console.log(req.session.message);
+                // console.log(req.session.message);
                 if (message==req.session.message) {
-                    req.session.username=result[0].login_name;
+                    req.session.username=result[0].username;
                     req.session.user_id=result[0].id;
                     req.session.login='1';
                     res.send('1');//登录成功，写入session
@@ -153,6 +153,19 @@ exports.noteNotes=function (req,res,next) {
             'text': result
         };
         res.json(obj);
+    })
+}
+//获取用户信息页面
+exports.noteUser=function (req,res,next) {
+    var username=req.params['username'];
+    mysql.find(user_sql.getInfo,[username],function (err,result) {
+        if (err) {
+            return;         
+        }
+        res.render('note-user',{
+            'username': result[0].username,
+            'telephone': result[0].telephone
+        })
     })
 }
 //显示编辑页面(在无内容和有内容情况下，渲染页面)

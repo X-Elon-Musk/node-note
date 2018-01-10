@@ -30,6 +30,8 @@ app.post('/register',router.register);
 app.get('/notePages',router.notePages);
 //获取个人所有备忘录文本
 app.get('/noteNotes',router.noteNotes);
+//获取用户信息页面
+app.get('/noteUser/:username?',router.noteUser);
 //显示编辑页面
 app.get('/noteEdit/:id?',router.noteEdit);
 //发表备忘记录

@@ -40,7 +40,7 @@
             <li class="forms-item">
                 <form>
                     <div class="form-item clearfix">
-                        <i class="fa fa-user-circle-o fa-lg label-icon"></i>
+                        <i class="fa fa-user fa-lg label-icon"></i>
                         <input type="text" class="form-control" id="username" placeholder="用户名">
                     </div>
                     <div class="form-item clearfix">
@@ -94,27 +94,16 @@
                 })   
             })
         },
+        //登录
         doSubmit: function () {
             var _this=this;
             $('#submit').click(function () {
-                /*if ($('#username').val()=='') {
-                    $('.prompt').html('请填写用户名').css({
-                        'visibility': 'visible'
-                    });
-                    return;
-                }
-                if ($('#password').val()=='') {
-                    $('.prompt').html('请填写密码').css({
-                        'visibility': 'visible'
-                    });
-                    return;
-                }*/
                 if (_this.mode=='message') {
                     var tele=_this.prompt('#telephone','请填写手机号');
                     if (!tele) return;
                     var code=_this.prompt('#identifying-code','请填写验证码');
                     if (!code) return;
-                    console.log('点击登录按钮');
+                    // console.log('点击登录按钮');
                     _this.submitMessage();
                 } else if(_this.mode=='password') {
                     var user=_this.prompt('#username','请填写用户名');
@@ -203,7 +192,7 @@
                 'telephone': $('#telephone').val(),
                 'message': $('#identifying-code').val()
             },function (result) {
-                console.log('页面结果'+result);
+                // console.log('页面结果'+result);
                 if (result=='1') {
                     window.location='/notePages';
                 } else if(result=='-1'){

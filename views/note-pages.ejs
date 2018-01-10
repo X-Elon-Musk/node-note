@@ -30,8 +30,9 @@
 
 <div class="container note-pages" id="notes">
     <header class="clearfix header">
-        <a href="javascript:;" class="return-button">
-            <i class="fa fa-chevron-left fa-lg"></i>
+        <a href="/noteUser/<%=username%>" class="user-info">
+            <i class="fa fa-user fa-lg"></i>
+            <%=username%>
         </a>
         <strong class="f_r edit-items edit-active" id="edit-items">编辑</strong>
     </header>
@@ -72,17 +73,18 @@
 
 
 <script type="text/javascript">
+    /*//发表
     $('.record').click(function () {
         $.post('/record',{
             'content': $('.text').val()
         },function (result) {
-            /*if (result.result==-1) {
+            // if (result.result==-1) {
                 
-            } else if(result.result==1){
-                console.log(1);
-            }  */    
+            // } else if(result.result==1){
+            //     console.log(1);
+            // }      
         })   
-    })
+    })*/
     /*//返回备忘录列表
     $('.return-button').click(function () {
         window.location="/register";   
