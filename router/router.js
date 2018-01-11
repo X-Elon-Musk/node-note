@@ -22,6 +22,7 @@ var user_sql={
     getId: 'select id from users where username=?',
     getPassword: 'select password from users where username=?',
     changeUsername: 'update users set username=? where id=?',
+    changeTelephone: 'update users set telephone=? where id=?',
     changePassword: 'update users set password=? where id=?'
 }
 var note_sql={
@@ -45,7 +46,7 @@ exports.login=function (req,res,next) {
     form.parse(req,function (err,fields,files) {
         //判断是短信登录还是密码登录
         var mode=fields.mode;
-        console.log(mode);
+        // console.log(mode);
         if (mode=='message') {
             var telephone=fields.telephone;
             var message=fields.message;
@@ -208,6 +209,58 @@ exports.noteChangeUsername=function (req,res,next) {
             })
         }
     })  
+}
+//显示修改用户手机号页面
+exports.noteTelephone=function (req,res,next) {
+    res.render('note-telephone',{})
+}
+//用户绑定手机号
+exports.bindTelephone=function (req,res,next) {
+    var user_id=req.session.user_id;
+    var form=new formidable.IncomingForm();
+    form.parse(req,function (err,fields,files) {
+        var telephone=fields.telephone;
+        var message=fields.message;
+        mysql.find(user_sql.getUser,[telephone],function (err,result) {
+            if (err) return;
+            if (result.length!=0) {
+                res.send('-1');//手机号已被注册
+            } else {
+                console.log('验证码：',message,req.session.message);
+                if (message==req.session.message) {
+                    mysql.update(user_sql.changeTelephone,[telephone,id],function (err,result) {
+                        if (err) return;  
+                        res.send('1');//绑定成功
+                    })
+                } else {
+                    res.send('-2');//验证码错误
+                }
+            }   
+        }) 
+    })
+}   
+//修改用户的手机号
+exports.noteChangeTelephone=function (req,res,next) {
+    /*var user_id=req.session.user_id;
+    var form=new formidable.IncomingForm();
+    form.parse(req,function (err,fields,files) {
+        var password=md5(md5(fields.password)+'792884274');;
+        mysql.find(user_sql.getInfoById,[user_id],function (err0,result0) {
+            if (err0) return;
+            if (result0[0].password==password) {
+                res.send('2');//修改后的密码和原密码相同         
+                return;
+            }
+            mysql.update(user_sql.changePassword,[password,user_id],function (err1,result1) {
+                if (err1) {
+                    return;         
+                } else{
+                    res.send('1');//密码修改成功
+                }
+            })
+        })
+
+    })  */
 }
 //显示修改用户密码页面
 exports.notePassword=function (req,res,next) {
@@ -381,6 +434,7 @@ exports.teleCode=function (req,res,next) {
                 /*//处理返回参数
                 console.log(res);*/
                 req.session.message=message;
+                console.log('手机验证码为：',req.session.message,message);
                 res.send('1');//发送成功 
             }
         }, function (err) {

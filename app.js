@@ -40,6 +40,12 @@ app.post('/noteChangeUsername',router.noteChangeUsername);
 app.get('/notePassword',router.notePassword);
 //修改用户的密码
 app.post('/noteChangePassword',router.noteChangePassword);
+//显示修改用户手机号页面
+app.get('/noteTelephone',router.noteTelephone);
+//用户绑定手机号
+app.post('/bindTelephone',router.bindTelephone);
+//修改用户的手机号
+app.post('/noteChangeTelephone',router.noteChangeTelephone);
 //显示编辑页面
 app.get('/noteEdit/:id?',router.noteEdit);
 //发表备忘记录

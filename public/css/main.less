@@ -156,7 +156,7 @@
     color: red;
     visibility: hidden;
 }
-//首页、注册页面
+//登录、注册页面
 .login-register{
     width: 100%;
     box-sizing: border-box;
@@ -205,6 +205,7 @@
         }
     }
 }
+//登录
 .login{
     .sign-in{
         width: 100%;
@@ -231,35 +232,37 @@
         }
         .modes-forms{
             width: 100%;
-            .forms-item{
-                width: 100%;
-                display: none;
-                &:nth-of-type(1){
-                    display: block;
-                }
-                .form-item{
-                    position: relative;
-                    font-size: 14px;
-                    .get-code{
-                        position: absolute;
-                        right: 0;
-                        top: 0;
-                        z-index: 10;
-                        height: 100%;
-                        width: 6em;
-                        padding: 0;
-                        margin: 0;
-                        line-height: 3em;
-                        text-align: center;
-                        background: none;
-                        border: none;
-                        color: #ccc;
-                    }
-                }
-            }
         }
     }
 }
+//手机号码
+.forms-item{
+    width: 100%;
+    display: none;
+    &:nth-of-type(1){
+        display: block;
+    }
+    .form-item{
+        position: relative;
+        font-size: 14px;
+        .get-code{
+            position: absolute;
+            right: 0;
+            top: 0;
+            z-index: 10;
+            height: 100%;
+            width: 6em;
+            padding: 0;
+            margin: 0;
+            line-height: 3em;
+            text-align: center;
+            background: none;
+            border: none;
+            color: #ccc;
+        }
+    }
+}
+//注册
 .register{
     .form-item{
         .form-captcha{
