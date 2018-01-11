@@ -23,6 +23,7 @@ var user_sql={
     getPassword: 'select password from users where username=?',
     changeUsername: 'update users set username=? where id=?',
     changeTelephone: 'update users set telephone=? where id=?',
+    changeMessage: 'update users set message=? where id=?',
     changePassword: 'update users set password=? where id=?'
 }
 var note_sql={
@@ -35,6 +36,8 @@ var note_sql={
     deleteUpdate: 'select * from notes where id=(select min(id) from notes where id>?)',
     updateNote: 'update notes set time=?,text=? where id=?'
 }
+
+
 
 //显示首页
 exports.index=function (req,res,next) {
@@ -162,7 +165,6 @@ exports.noteNotes=function (req,res,next) {
 //获取用户信息页面
 exports.noteUser=function (req,res,next) {
     //没有登录
-    // console.log('&&&&&&&&&&&&&&&:'+req.session.username);
     if (req.session.login!=='1') {
         return;   
     }
@@ -171,7 +173,6 @@ exports.noteUser=function (req,res,next) {
         if (err) {
             return;         
         }
-        // console.log(result[0].id);
         res.render('note-user',{
             'id': result[0].id,
             'username': result[0].username,
@@ -181,6 +182,7 @@ exports.noteUser=function (req,res,next) {
 }
 //显示修改用户名页面
 exports.noteUsername=function (req,res,next) {
+    // req.session.login='123456';
     res.render('note-username',{})
 }
 //修改用户的用户名
@@ -212,29 +214,48 @@ exports.noteChangeUsername=function (req,res,next) {
 }
 //显示修改用户手机号页面
 exports.noteTelephone=function (req,res,next) {
-    res.render('note-telephone',{})
+    res.render('note-telephone',{
+        'telephone': req.session.telephone
+    })
 }
 //用户绑定手机号
 exports.bindTelephone=function (req,res,next) {
+    /*var form=new formidable.IncomingForm();
+    // console.log('验证码：',req.session.message);
+    form.parse(req,function (err,fields,files) {
+        req.session.login='123456';
+        // console.log('验证码：',req.session,req.sessionID);
+        mysql.find(user_sql.getInfoById,[req.session.user_id],function (err,result) {
+            if (err) return; 
+            console.log(result);  
+        })
+    })*/
+    
     var user_id=req.session.user_id;
     var form=new formidable.IncomingForm();
+    // console.log('验证码：',req.session.message);
     form.parse(req,function (err,fields,files) {
         var telephone=fields.telephone;
         var message=fields.message;
+        // console.log('验证码：',message,req.session,req.sessionID);
         mysql.find(user_sql.getUser,[telephone],function (err,result) {
             if (err) return;
             if (result.length!=0) {
                 res.send('-1');//手机号已被注册
             } else {
-                console.log('验证码：',message,req.session.message);
-                if (message==req.session.message) {
-                    mysql.update(user_sql.changeTelephone,[telephone,id],function (err,result) {
-                        if (err) return;  
-                        res.send('1');//绑定成功
-                    })
-                } else {
-                    res.send('-2');//验证码错误
-                }
+                mysql.find(user_sql.getInfoById,[req.session.user_id],function (err,result) {
+                    if (err) return; 
+                    console.log('结果'+result); 
+                    // console.log('验证码：',message,req.session.message);
+                    if (message==result[0].message) {
+                        mysql.update(user_sql.changeTelephone,[telephone,user_id],function (err,result) {
+                            if (err) return;  
+                            res.send('1');//绑定成功
+                        })
+                    } else {
+                        res.send('-2');//验证码错误
+                    } 
+                })
             }   
         }) 
     })
@@ -420,27 +441,40 @@ exports.teleCode=function (req,res,next) {
     form.parse(req,function (err,fields,files) {
         var telephone=fields.telephone;
         var message=createParam();
-        //初始化sms_client
+        console.log(message);
+        mysql.update(user_sql.changeMessage,[message,req.session.user_id],function (err,result) {
+            if (err) return; 
+            req.session.telephone=true;
+            console.log(req.session);
+            res.send('1');//发送成功 
+        })
+        /*//初始化sms_client
         let smsClient = new SMSClient({accessKeyId, secretAccessKey});
         //发送短信
         smsClient.sendSMS({
+            // PhoneNumbers: telephone,
+            // SignName: '李超',
+            // TemplateCode: 'SMS_121905126',
+            // TemplateParam: '{"name":'+telephone+'}'
             PhoneNumbers: telephone,
             SignName: '李超',
             TemplateCode: 'SMS_121165464',
             TemplateParam: '{"code":'+message+'}'
-        }).then(function (res) {
-            let {Code}=res
+        }).then(function (result0) {
+            let {Code}=result0;
             if (Code === 'OK') {
-                /*//处理返回参数
-                console.log(res);*/
-                req.session.message=message;
-                console.log('手机验证码为：',req.session.message,message);
-                res.send('1');//发送成功 
+                //处理返回参数
+                // console.log(result0);
+                console.log(message);
+                mysql.update(user_sql.changeMessage,[message,req.session.user_id],function (err,result) {
+                    if (err) return; 
+                    res.send('1');//发送成功 
+                })
             }
         }, function (err) {
             console.log('获取手机验证码错误:'+err);
             return;
-        })
+        })*/
     })
     function createParam() {
         var param='';
