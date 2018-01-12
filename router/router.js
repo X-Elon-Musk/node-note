@@ -237,27 +237,74 @@ exports.bindTelephone=function (req,res,next) {
     form.parse(req,function (err,fields,files) {
         var telephone=fields.telephone;
         var message=fields.message;
+        var state=fields.state;
         // console.log('验证码：',message,req.session,req.sessionID);
         mysql.find(user_sql.getUser,[telephone],function (err,result) {
             if (err) return;
-            if (result.length!=0) {
+            /*if (result.length!=0&&req.session.telephone) {
                 res.send('-1');//手机号已被注册
-            } else {
-                mysql.find(user_sql.getInfoById,[req.session.user_id],function (err,result) {
+            } else if(result.length==0){*/
+            // console.log('telephone:',req.session.telephone);
+            if(result.length==0||result.length!=0&&user_id==result[0].id){
+                mysql.find(user_sql.getInfoById,[user_id],function (err,result) {
                     if (err) return; 
-                    console.log('结果'+result); 
+                    // console.log('结果'+result); 
                     // console.log('验证码：',message,req.session.message);
                     if (message==result[0].message) {
-                        mysql.update(user_sql.changeTelephone,[telephone,user_id],function (err,result) {
-                            if (err) return;  
-                            res.send('1');//绑定成功
-                        })
-                    } else {
-                        res.send('-2');//验证码错误
+                        if (state=='bind') {
+                            mysql.update(user_sql.changeTelephone,[telephone,user_id],function (err,result) {
+                                if (err) return;  
+                                req.session.telephone=telephone;
+                                res.send('1');//绑定成功
+                            })           
+                        } else{
+                            res.send('1');//旧手机号验证码正确
+                        }
+                        return;
                     } 
+                    res.send('-2');//验证码错误
                 })
-            }   
+                return;
+            }
+            console.log('未注册');
+            res.send('-1');//手机号已被注册 
+
+
         }) 
+
+
+        /*mysql.find(user_sql.getUser,[telephone],function (err,result) {
+            if(result.length==0){
+                if (req.session.telephone) {
+                    if (message==result[0].message) {
+                        if (state=='bind') {
+                            mysql.find(user_sql.getInfoById,[user_id],function (err,result) {
+                                if (err) return; 
+                                // console.log('结果'+result); 
+                                // console.log('验证码：',message,req.session.message);
+                                if (message==result[0].message) {
+                                    mysql.update(user_sql.changeTelephone,[telephone,user_id],function (err,result) {
+                                        if (err) return;  
+                                        req.session.telephone=true;
+                                        res.send('1');//绑定成功
+                                    })           
+                                    return;
+                                } 
+                                res.send('-2');//验证码错误
+                            })           
+                        } else{
+                            res.send('1');//旧手机号验证码正确
+                        }
+                        return;
+                    } 
+                } else{
+
+                }
+            } else{
+
+            }
+        })*/
+        
     })
 }   
 //修改用户的手机号
@@ -442,9 +489,10 @@ exports.teleCode=function (req,res,next) {
         var telephone=fields.telephone;
         var message=createParam();
         console.log(message);
+        // res.send('1');//发送成功 
         mysql.update(user_sql.changeMessage,[message,req.session.user_id],function (err,result) {
             if (err) return; 
-            req.session.telephone=true;
+            // req.session.telephone=true;
             console.log(req.session);
             res.send('1');//发送成功 
         })

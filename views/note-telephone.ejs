@@ -20,17 +20,17 @@
         <a href="javascript:history.back(-1)" class="f_l">
             <i class="fa fa-chevron-left fa-lg"></i>
         </a>
-        <%if (telephone) {%>
-            <span class="header-text change-telephone">换绑手机</span>         
+        <%if (!telephone) {%>
+            <span class="header-text bind-telephone">绑定手机</span>
         <%} else{%>
-            <span class="header-text bind-telephone">绑定手机<%=telephone%></span>
+            <span class="header-text change-telephone" telephone="old">换绑手机</span>  
         <%}%>
     </header>
     <div class="content login-register">
         <div class="forms-item">
             <div class="form-item clearfix">
                 <i class="fa fa-phone fa-lg label-icon"></i>
-                <input type="tel" class="form-control" maxlength="11" id="telephone" placeholder="手机号">
+                <input type="tel" class="form-control" maxlength="11" id="telephone" placeholder="手机号" value="<%=telephone%>">
                 <button class="get-code" disabled="disabled">获取验证码</button>
             </div>
             <div class="form-item clearfix">
@@ -44,6 +44,18 @@
 </div>
 
 <script type="text/javascript">
+    $(function(){
+        if ($('.header-text').hasClass('bind-telephone')) {
+            console.log(1);
+            new BindTelephone();        
+        } else if($('.header-text').hasClass('change-telephone')){
+            console.log(2);
+            $('#telephone').attr('readonly','readonly');
+            var changeTelephone=new ChangeTelephone();
+            changeTelephone.buttonState();
+        }
+    })
+    
     function BindTelephone() {
         this.init();
     }
@@ -61,7 +73,6 @@
                 if (!tele) return;
                 var code=_this.prompt('#identifying-code','请填写验证码');
                 if (!code) return;
-                // console.log('点击登录按钮');
                 _this.submitMessage();
             })
         },
@@ -69,18 +80,22 @@
         teleInput: function () {
             var _this=this;
             $('#telephone').bind('input',function () {
-                if (_this.testTele()) {
-                    $('.get-code').removeAttr('disabled').css({
-                        color: '#34495e'
-                    });
-                    _this.teleCode();
-                } else{
-                    $('.get-code').attr('disabled','disabled').css({
-                        color: '#ccc'
-                    });
-                }
+                _this.buttonState();
             });           
-        },  
+        },
+        //点击按钮状态变化 
+        buttonState: function () {
+            if (this.testTele()) {
+                $('.get-code').removeAttr('disabled').css({
+                    color: '#34495e'
+                });
+                this.getCode();
+            } else{
+                $('.get-code').unbind().attr('disabled','disabled').css({
+                    color: '#ccc'
+                });
+            }
+        },   
         //正则匹配手机号
         testTele: function () {
             var tele=document.getElementById('telephone').value;
@@ -113,17 +128,12 @@
             });
         },
         //获取手机验证码
-        teleCode: function () {
+        getCode: function () {
             // console.log('点击了几次');
+            var _this=this;
             $('.get-code').click(function (event) {
                 event.stopPropagation();
-                $.post('/teleCode',{
-                    'telephone': $('#telephone').val()
-                },function (result) {
-                    if (result!=='1') {
-                        return; 
-                    }
-                })
+                _this.teleCode();
                 $('.get-code').attr('disabled','disabled').css({
                     color: '#ccc'
                 });
@@ -135,46 +145,90 @@
                 },2000)
             })
         },
+        //ajax获取手机验证码
+        teleCode: function () {
+            $.post('/teleCode',{
+                'telephone': $('#telephone').val()
+            },function (result) {
+                if (result!=='1') {
+                    return; 
+                }
+            })
+        },
         //短信登录
         submitMessage: function () {
             var _this=this;
             $.post('/bindTelephone',{
                 'telephone': $('#telephone').val(),
-                'message': $('#identifying-code').val()
+                'message': $('#identifying-code').val(),
+                'state': 'bind' 
             },function (result) {
                 if (result=='1') {
                     window.location='/noteUser';//绑定成功
-                    // console.log('绑定成功');
                 } else if(result=='-1'){
-                    _this.promptDom('手机号已被注册');
+                    _this.promptDom('手机号已被占用');
                 } else if(result=='-2'){
                     _this.promptDom('验证码不正确');
                 }
             })
         },  
     }
-    new BindTelephone();
+    
 
 
 
         
     //更改手机号
     function ChangeTelephone() {
+        this.state='';
         this.init();
     }
     ChangeTelephone.prototype={
         constructor: ChangeTelephone,
         init: function () {
             this.submit();
+            this.teleInput();
         },
+        //点击确定按钮提交
         submit: function () {
             var _this=this;
             $('#submit').click(function () {
                 var user=_this.prompt('#telephone','手机号不能为空');
                 if (!user) return;
-                _this.toAjax();
+                var code=_this.prompt('#identifying-code','请填写验证码');
+                if (!code) return;
+                _this.submitMessage();     
             })
         },
+        //检测手机号输入框
+        teleInput: function () {
+            var _this=this;
+            $('#telephone').bind('input',function () {
+                _this.buttonState();
+            });           
+        }, 
+        //点击按钮状态变化 
+        buttonState: function () {
+            if (this.testTele()) {
+                $('.get-code').removeAttr('disabled').css({
+                    color: '#34495e'
+                });
+                this.getCode();
+            } else{
+                $('.get-code').unbind().attr('disabled','disabled').css({
+                    color: '#ccc'
+                });
+            }
+        }, 
+        //正则匹配手机号
+        testTele: function () {
+            var tele=document.getElementById('telephone').value;
+            var myreg=/^[1][3,4,5,7,8][0-9]{9}$/;  
+            if (!myreg.test(tele)) {  
+                return false;  
+            }  
+            return true;  
+        }, 
         //提示信息
         prompt: function (id,text) {
             var _this=this;
@@ -193,28 +247,74 @@
                 'visibility': visible
             });
         }, 
-        //ajax提交后天
-        toAjax: function () {
+        getCode: function () {
+            // console.log('点击了几次');
             var _this=this;
-            var val=$('#telephone').val();
-            if (val=='') {
-                return;  
-            }
-            $.post('/noteChangeTelephone',{
-                'telephone': val
+            $('.get-code').click(function (event) {
+                event.stopPropagation();
+                _this.teleCode();
+                $('.get-code').unbind().attr('disabled','disabled').css({
+                    color: '#ccc'
+                });
+                var timer=setTimeout(function () {
+                    $('.get-code').removeAttr('disabled').css({
+                        color: '#34495e'
+                    });
+                    clearTimeout(timer);
+                },500)
+            })
+        },
+        //短信登录
+        submitMessage: function () {
+            var _this=this;
+            var state=this.state;
+            $.post('/bindTelephone',{
+                'telephone': $('#telephone').val(),
+                'message': $('#identifying-code').val(),
+                'state': state 
             },function (result) {
-                if (result=='1') {
-                    window.location='/noteUser';                  
-                } else if(result=='2'){
-                    _this.promptDom('新手机号和老手机号相同');
-                } else{
-                    return;
+                _this.callback(result);
+            })
+        },  
+        callback: function (result) {
+            if (result=='1') {
+                if (this.state=='bind') {
+                   window.location='/noteUser';//换绑成功
+                   return;
+                } 
+                this.state='bind';
+                $('#telephone').removeAttr('readonly');
+                $('.form-control').val('');
+                $('#telephone').attr('placeholder','新手机号');  
+                this.promptDom('');
+            } else if(result=='-1'){
+                this.promptDom('手机号未注册');
+            } else if(result=='-2'){
+                this.promptDom('验证码不正确');
+            }
+        },
+            
+        //ajax获取手机验证码
+        teleCode: function () {
+            $.post('/teleCode',{
+                'telephone': $('#telephone').val()
+            },function (result) {
+                if (result!=='1') {
+                    return; 
                 }
             })
-        }
-                 
+        }     
     }
-    // new ChangeTelephone();
+    /*function Methods() {
+        this.init();
+    }
+    Methods.prototype={
+        constructor: Methods,
+        init: function () {
+            
+        },
+          
+    }*/
 </script>
 </body>
 </html>
