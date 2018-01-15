@@ -48,7 +48,8 @@
         var methods=new Methods();
         if ($('.header-text').hasClass('bind-telephone')) {
             /*console.log(1);
-            new BindTelephone(); */ 
+            new BindTelephone(); */
+            console.log(1); 
             methods.state='bind';
             methods.init();      
         } else if($('.header-text').hasClass('change-telephone')){
@@ -58,7 +59,7 @@
             changeTelephone.buttonState();*/
             console.log(2);
             $('#telephone').attr('readonly','readonly');
-            methods.state='bind';
+            methods.state='';
             methods.init();  
             methods.buttonState();  
             /*var changeTelephone=new ChangeTelephone();
@@ -176,7 +177,6 @@
                 'state': state 
             },function (result) {
                 _this.callback(result);
-                
             })
         }, 
         //回调函数
@@ -441,9 +441,9 @@
             if (result=='1') {
                 window.location='/noteUser';//绑定成功
             } else if(result=='-1'){
-                _this.promptDom('手机号已被占用');
+                this.promptDom('手机号已被占用');
             } else if(result=='-2'){
-                _this.promptDom('验证码不正确');
+                this.promptDom('验证码不正确');
             }
         },  
         //换绑回调函数

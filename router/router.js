@@ -238,6 +238,7 @@ exports.bindTelephone=function (req,res,next) {
         var telephone=fields.telephone;
         var message=fields.message;
         var state=fields.state;
+        console.log(state);
         // console.log('验证码：',message,req.session,req.sessionID);
         mysql.find(user_sql.getUser,[telephone],function (err,result) {
             if (err) return;
@@ -245,7 +246,8 @@ exports.bindTelephone=function (req,res,next) {
                 res.send('-1');//手机号已被注册
             } else if(result.length==0){*/
             // console.log('telephone:',req.session.telephone);
-            if(result.length==0||result.length!=0&&user_id==result[0].id){
+            if(result.length==0&&state=='bind'||result.length!=0&&user_id==result[0].id&&state==''){
+                // console.log(result.length==0,result.length!=0&&user_id==result[0].id,user_id,result[0].id);
                 mysql.find(user_sql.getInfoById,[user_id],function (err,result) {
                     if (err) return; 
                     // console.log('结果'+result); 
