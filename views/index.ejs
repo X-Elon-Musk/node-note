@@ -157,6 +157,7 @@
         }, 
         //DOM元素prompt设定
         promptDom: function (text,visible) {
+            console.log('--------------');
             if (!visible){
                 var visible='visible';
             } 
@@ -169,7 +170,7 @@
             // console.log('点击了几次');
             var _this=this;
             $('.get-code').click(function (event) {
-                console.log(1);
+                // console.log(1);
                 event.stopPropagation();
                 _this.teleCode();
                 $('.get-code').unbind().attr('disabled','disabled').css({
@@ -191,9 +192,11 @@
             $.post('/teleCode',{
                 'telephone': _this.telephone
             },function (result) {
-                if (result!=='1') {
-                    return; 
+                console.log(result,result=='-1');
+                if (result=='-1') {
+                    _this.promptDom('手机号码未注册');
                 }
+                return;
             })
         },
         //短信登录

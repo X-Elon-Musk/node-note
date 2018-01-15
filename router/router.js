@@ -23,7 +23,8 @@ var user_sql={
     getPassword: 'select password from users where username=?',
     changeUsername: 'update users set username=? where id=?',
     changeTelephone: 'update users set telephone=? where id=?',
-    changeMessage: 'update users set message=? where id=?',
+    changeMessageByTel: 'update users set message=? where telephone=?',
+    changeMessageById: 'update users set message=? where id=?',
     changePassword: 'update users set password=? where id=?'
 }
 var note_sql={
@@ -64,8 +65,8 @@ exports.login=function (req,res,next) {
                     return;
                 }
                 // req.session.message='908370';
-                // console.log(req.session.message);
-                if (message==req.session.message) {
+                console.log(message,result[0].message);
+                if (message==result[0].message) {
                     req.session.username=result[0].username;
                     req.session.user_id=result[0].id;
                     req.session.login='1';
@@ -500,12 +501,63 @@ exports.teleCode=function (req,res,next) {
         var message=createParam();
         console.log(message);
         // res.send('1');//发送成功 
-        mysql.update(user_sql.changeMessage,[message,req.session.user_id],function (err,result) {
-            if (err) return; 
-            // req.session.telephone=true;
-            console.log(req.session);
-            res.send('1');//发送成功 
-        })
+        
+        /*if (req.session.login!=='1') {
+            mysql.find(user_sql.getUser,[telephone],function (err0,result0) {
+                if(err0) return;
+                if (result0.length!==0) {
+                    mysql.update(user_sql.changeMessageByTel,[message,telephone],function (err1,result1) {
+                        if (err1) return; 
+                        // req.session.telephone=true;
+                        console.log(req.session);
+                        res.send('1');//发送成功 
+                    })
+                    return;
+                } 
+                res.send('-1')//手机号码未注册
+                return;                                 
+            })            
+        } else{
+            mysql.find(user_sql.getUser,[telephone],function (err0,result0) {
+                if(err0) return;
+                if (result0.length!==0) {
+                    mysql.update(user_sql.changeMessageByTel,[message,telephone],function (err1,result1) {
+                        if (err1) return; 
+                        res.send('1');//发送成功 
+                    })
+                    return;
+                } else{
+                    mysql.update(user_sql.changeMessageById,[message,req.session.user_id],function (err1,result1) {
+                        if (err1) return; 
+                        res.send('1');//发送成功 
+                    })
+                }                               
+            }) 
+        }*/
+         
+
+        mysql.find(user_sql.getUser,[telephone],function (err0,result0) {
+            if(err0) return;
+            //首页短信登录，为不登录状态。更换手机号时初次验证旧手机号，为登录状态。
+            if (result0.length!==0) {
+                mysql.update(user_sql.changeMessageByTel,[message,telephone],function (err1,result1) {
+                    if (err1) return; 
+                    res.send('1');//发送成功 
+                })
+            } 
+            //绑定手机号和更换手机号时第二次验证新手机，两种情况下都为登录状态
+            else if(result0.length==0&&req.session.login=='1'){
+                mysql.update(user_sql.changeMessageById,[message,req.session.user_id],function (err1,result1) {
+                    if (err1) return; 
+                    res.send('1');//发送成功 
+                })
+            } 
+            else{
+                res.send('-1')//手机号码未注册
+                return;               
+            }                            
+        })    
+        
         /*//初始化sms_client
         let smsClient = new SMSClient({accessKeyId, secretAccessKey});
         //发送短信
@@ -524,7 +576,7 @@ exports.teleCode=function (req,res,next) {
                 //处理返回参数
                 // console.log(result0);
                 console.log(message);
-                mysql.update(user_sql.changeMessage,[message,req.session.user_id],function (err,result) {
+                mysql.update(user_sql.changeMessageByTel,[message,req.session.user_id],function (err,result) {
                     if (err) return; 
                     res.send('1');//发送成功 
                 })
