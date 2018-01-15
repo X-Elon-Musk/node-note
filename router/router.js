@@ -176,7 +176,7 @@ exports.noteUser=function (req,res,next) {
         res.render('note-user',{
             'id': result[0].id,
             'username': result[0].username,
-            'telephone': result[0].telephone
+            'telephone': telephone_change(result[0].telephone)
         })
     })
 }
@@ -214,8 +214,15 @@ exports.noteChangeUsername=function (req,res,next) {
 }
 //显示修改用户手机号页面
 exports.noteTelephone=function (req,res,next) {
-    res.render('note-telephone',{
-        'telephone': req.session.telephone
+    var username=req.session.username;
+    mysql.find(user_sql.getInfo,[username],function (err,result) {
+        if (err) {
+            return;         
+        }
+        res.render('note-telephone',{
+            'telephone': telephone_change(result[0].telephone),
+            'hide_telephone': result[0].telephone
+        })
     })
 }
 //用户绑定手机号
@@ -238,7 +245,7 @@ exports.bindTelephone=function (req,res,next) {
         var telephone=fields.telephone;
         var message=fields.message;
         var state=fields.state;
-        console.log(state);
+        console.log(telephone);
         // console.log('验证码：',message,req.session,req.sessionID);
         mysql.find(user_sql.getUser,[telephone],function (err,result) {
             if (err) return;
@@ -272,8 +279,6 @@ exports.bindTelephone=function (req,res,next) {
             }
             console.log('未注册');
             res.send('-1');//手机号已被注册 
-
-
         }) 
 
 
@@ -343,14 +348,15 @@ exports.noteChangePassword=function (req,res,next) {
     var user_id=req.session.user_id;
     var form=new formidable.IncomingForm();
     form.parse(req,function (err,fields,files) {
-        var password=md5(md5(fields.password)+'792884274');;
+        var old_password=md5(md5(fields.old_password)+'792884274');
+        var new_password=md5(md5(fields.new_password)+'792884274');
         mysql.find(user_sql.getInfoById,[user_id],function (err0,result0) {
             if (err0) return;
-            if (result0[0].password==password) {
-                res.send('2');//修改后的密码和原密码相同         
+            if (result0[0].password!=old_password) {
+                res.send('-1');//旧密码不正确         
                 return;
             }
-            mysql.update(user_sql.changePassword,[password,user_id],function (err1,result1) {
+            mysql.update(user_sql.changePassword,[new_password,user_id],function (err1,result1) {
                 if (err1) {
                     return;         
                 } else{
@@ -539,12 +545,6 @@ exports.teleCode=function (req,res,next) {
     
 
 
-
-
-
-
-
-    
 //获取当前时间
 function getNowFormatDate(date) {
     var seperator=":";
@@ -553,6 +553,11 @@ function getNowFormatDate(date) {
     var day=date.getDate();
     var currentdate=year+"年"+month+"月"+day+"日"+date.getHours()+seperator+date.getMinutes();
     return currentdate;
+}
+//改变电话号码显示效果
+function telephone_change(telephone) {
+    var new_telephone=telephone.substr(0,3)+'****'+telephone.substr(7);
+    return new_telephone;
 }
 
 

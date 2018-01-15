@@ -42,15 +42,15 @@
         submit: function () {
             var _this=this;
             $('#submit').click(function () {
-                var user=_this.prompt('#change-username','用户名不能为空');
+                var user=_this.prompt('#change-username','','用户名不能为空');
                 if (!user) return;
                 _this.toAjax();
             })
         },
         //提示信息
-        prompt: function (id,text) {
+        prompt: function (element,value,text) {
             var _this=this;
-            if ($(id).val()=='') {
+            if ($(element).val()==value) {
                 _this.promptDom(text);
                 return false;
             }
