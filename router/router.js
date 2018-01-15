@@ -247,11 +247,13 @@ exports.bindTelephone=function (req,res,next) {
             } else if(result.length==0){*/
             // console.log('telephone:',req.session.telephone);
             if(result.length==0&&state=='bind'||result.length!=0&&user_id==result[0].id&&state==''){
-                // console.log(result.length==0,result.length!=0&&user_id==result[0].id,user_id,result[0].id);
+                //已绑定手机号，换绑手机。第一步验证当前手机号，无需再存数据库
+                if (state=='') {
+                    res.send('1');
+                    return;
+                }
                 mysql.find(user_sql.getInfoById,[user_id],function (err,result) {
                     if (err) return; 
-                    // console.log('结果'+result); 
-                    // console.log('验证码：',message,req.session.message);
                     if (message==result[0].message) {
                         if (state=='bind') {
                             mysql.update(user_sql.changeTelephone,[telephone,user_id],function (err,result) {
