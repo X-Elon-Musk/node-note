@@ -280,41 +280,7 @@ exports.bindTelephone=function (req,res,next) {
             }
             console.log('未注册');
             res.send('-1');//手机号已被注册 
-        }) 
-
-
-        /*mysql.find(user_sql.getUser,[telephone],function (err,result) {
-            if(result.length==0){
-                if (req.session.telephone) {
-                    if (message==result[0].message) {
-                        if (state=='bind') {
-                            mysql.find(user_sql.getInfoById,[user_id],function (err,result) {
-                                if (err) return; 
-                                // console.log('结果'+result); 
-                                // console.log('验证码：',message,req.session.message);
-                                if (message==result[0].message) {
-                                    mysql.update(user_sql.changeTelephone,[telephone,user_id],function (err,result) {
-                                        if (err) return;  
-                                        req.session.telephone=true;
-                                        res.send('1');//绑定成功
-                                    })           
-                                    return;
-                                } 
-                                res.send('-2');//验证码错误
-                            })           
-                        } else{
-                            res.send('1');//旧手机号验证码正确
-                        }
-                        return;
-                    } 
-                } else{
-
-                }
-            } else{
-
-            }
-        })*/
-        
+        })        
     })
 }   
 //修改用户的手机号
