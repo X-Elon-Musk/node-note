@@ -55,8 +55,8 @@ User_sql.prototype={
     }
 }
 //操作备忘录数据库
-var Note_sql1=function () {};
-Note_sql1.prototype={
+var Note_sql=function () {};
+Note_sql.prototype={
     constructor: Note_sql,
     init: function () {
         
@@ -66,15 +66,24 @@ Note_sql1.prototype={
     },
     select: function (column,condition,additional) {
         if (!additional) additional=''; 
-        return 'select '+column+' from notes'+additional+' where '+condition+'=?';
+        return 'select '+column+' from notes where '+condition+'=?'+additional;
     },
-    update: function (time,text,condition) {
-        return 'update notes'++' set '+time+'=?,'+text+'=? where '+condition+'=?';
+    update: function (condition) {
+        return 'update notes set time=?,text=? where '+condition+'=?';
+    },
+    delete: function (condition) {
+        return 'delete from notes where '+condition+'=?';   
+    },
+    //删除后显示下一条信息
+    delete_select: function () {
+        return 'select * from notes where id=(select min(id) from notes where id>? and user_id=?)';
     }
 }
 var user_sql=new User_sql();
-var note_sql1=new Note_sql1();
-console.log(note_sql1.select('*','id','limit 1'));
+var note_sql=new Note_sql();
+/*console.log(note_sql.select('*','user_id','limit 1 '));
+console.log(note_sql.select('*','user_id',' and rownum=1'));
+console.log(note_sql.select('*','id'));*/
 
 
 //显示首页
@@ -189,7 +198,7 @@ exports.notePages=function (req,res,next) {
 //获取个人所有备忘录文本
 exports.noteNotes=function (req,res,next) {
     var user_id=req.session.user_id;
-    mysql.find(note_sql.getNotes,[user_id],function (err,result) {
+    mysql.find(note_sql.select('*','user_id'),[user_id],function (err,result) {
         if (err||result.length==0) {
             res.json('');
             return;         
@@ -365,7 +374,7 @@ exports.noteChangePassword=function (req,res,next) {
                 res.send('-1');//旧密码不正确         
                 return;
             }
-            mysql.update(user_sql.update('password','id'),[new_password,user_id],function (err1,result1) {
+            mysql.update(user_sq.update('password','id'),[new_password,user_id],function (err1,result1) {
                 if (err1) {
                     return;         
                 } else{
@@ -380,7 +389,7 @@ exports.noteChangePassword=function (req,res,next) {
 exports.noteEdit=function (req,res,next) {
     var id=req.params['id'];
     if (id) {
-        mysql.find(note_sql.getNoteByid,[id],function (err,result) {
+        mysql.find(note_sql.select('*','id'),[id],function (err,result) {
             if (result.length!==0) {
                 res.render('note-edit',{
                     'active': 'note-edit',
@@ -421,7 +430,7 @@ exports.record=function (req,res,next) {
         var text=arr[1].split('=')[1];
         if (id) {
             time=getNowFormatDate(new Date());
-            mysql.update(note_sql.updateNote,[time,text,id],function (err,result) {
+            mysql.update(note_sql.update('id'),[time,text,id],function (err,result) {
                 if (err) {
                     res.send('-3');
                     return;         
@@ -429,7 +438,7 @@ exports.record=function (req,res,next) {
                 res.send('1');//更改成功
             })       
         } else{
-            mysql.insertOne(note_sql.insert,[req.session.user_id,text,time],function (err,result) {
+            mysql.insertOne(note_sql.insert('user_id','text','time'),[req.session.user_id,text,time],function (err,result) {
                 if (err) {
                     res.send('-3');
                     return;         
@@ -444,11 +453,12 @@ exports.record=function (req,res,next) {
 exports.delete=function (req,res,next) {
     var id=req.params['id'];
     var form=new formidable.IncomingForm();
+    var user_id=req.session.user_id;
     form.parse(req,function (err,fields,files) {
         var follow=fields.follow;
         //判断是否有后续操作(是否要显示下一条数据)
         if (follow=='true') {
-            mysql.find(note_sql.deleteUpdate,[id],function (err,result0) {
+            mysql.find(note_sql.delete_select(),[id,user_id],function (err,result0) {
                 if (err) {
                     res.send('-3');
                     return;         
@@ -458,10 +468,10 @@ exports.delete=function (req,res,next) {
                     renderDelete(res,result0[0].id);          
                 } else{
                     //没有下一行就显示数据库中第一行
-                    mysql.find(note_sql.getTop,[],function (err,result1) {
+                    mysql.find(note_sql.select('*','user_id',' limit 1'),[user_id],function (err,result1) {
                         //判断第一行是否是要删除的那行
                         if (result1[0].id==id) {
-                            mysql.delete(note_sql.delete,[id],function (err,result) {
+                            mysql.delete(note_sql.delete('id'),[id],function (err,result) {
                                 renderDelete(res,'');  
                             })          
                         } else{
@@ -471,7 +481,7 @@ exports.delete=function (req,res,next) {
                 }
             })           
         } else if(follow=='false'){
-            mysql.delete(note_sql.delete,[id],function (err,result) {
+            mysql.delete(note_sql.delete('id'),[id],function (err,result) {
                 if (err) {
                     res.send('-3');
                     return;         
@@ -486,7 +496,7 @@ exports.delete=function (req,res,next) {
             state: '1',
             id: new_id 
         });
-        mysql.delete(note_sql.delete,[req.params['id']],function (err,result) {}) 
+        mysql.delete(note_sql.delete('id'),[req.params['id']],function (err,result) {}) 
     }   
 }
 //获取图片验证码
