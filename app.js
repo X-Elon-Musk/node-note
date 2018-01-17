@@ -30,6 +30,8 @@ app.post('/register',router.register);
 app.get('/notePages',router.notePages);
 //获取个人所有备忘录文本
 app.get('/noteNotes',router.noteNotes);
+//搜索备忘录
+app.post('/noteSearch',router.noteSearch);
 //获取用户信息页面
 app.get('/noteUser',router.noteUser);
 //显示修改用户名页面
@@ -44,8 +46,8 @@ app.post('/noteChangePassword',router.noteChangePassword);
 app.get('/noteTelephone',router.noteTelephone);
 //用户绑定手机号
 app.post('/bindTelephone',router.bindTelephone);
-//修改用户的手机号
-app.post('/noteChangeTelephone',router.noteChangeTelephone);
+/*//修改用户的手机号
+app.post('/noteChangeTelephone',router.noteChangeTelephone);*/
 //显示编辑页面
 app.get('/noteEdit/:id?',router.noteEdit);
 //发表备忘记录

@@ -38,6 +38,10 @@
     </header>
     <div class="content">
         <h1 class="title">备忘录</h1>
+        <div class="note-search">
+            <i class="fa fa-search fa-lg search-icon"></i>
+            <input type="text" class="form-control" id="search" placeholder="搜索">
+        </div>
         <div class="notes">
             <ul class="notes-items" data-bind="foreach:{data: notes}">
                 <li class="notes-item clearfix" data-bind="attr:{id:id}">
@@ -85,6 +89,29 @@
             // }      
         })   
     })*/
+
+    noteSearch();
+    //搜索
+    function noteSearch() {
+        $('#search').bind('input',function () {
+            $.post('noteSearch',{
+                'text': $('#search').val()
+            },function (result) {
+                if (result) {
+                    // var vm=new ViewModel(result.text);
+                    // ko.applyBindings(vm);
+                } else{
+                    // alert('错误！');
+                }
+            })
+        })
+    }
+        
+
+
+
+
+
     noteNotes();
     var notes;
     //获取个人所有备忘录文本

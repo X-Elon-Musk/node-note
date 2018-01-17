@@ -12,7 +12,7 @@ const secretAccessKey = 'WNce8J1x0TQFkb57jYOnXW2xyM8pD7'
 
 
 
-//sql命令
+/*//sql命令
 var user_sql={
     insert: 'insert into users(username,password) values(?,?)',
     queryAll: 'select * from users',
@@ -36,7 +36,7 @@ var note_sql={
     delete: 'delete from notes where id=?',
     deleteUpdate: 'select * from notes where id=(select min(id) from notes where id>?)',
     updateNote: 'update notes set time=?,text=? where id=?'
-}
+}*/
 //操作用户数据库
 var User_sql=function () {};
 User_sql.prototype={
@@ -47,7 +47,8 @@ User_sql.prototype={
     insert: function (username,password) {
         return 'insert into users('+username+','+password+') values(?,?)';
     },
-    select: function (column,condition) {
+    select: function (condition,column) {
+        if (!column) column='*';
         return 'select '+column+' from users where '+condition+'=?';
     },
     update: function (column,condition) {
@@ -68,6 +69,11 @@ Note_sql.prototype={
         if (!additional) additional=''; 
         return 'select '+column+' from notes where '+condition+'=?'+additional;
     },
+    //模糊查找
+    select_fuzzy: function (text,column) {
+        if (!column) column='*';
+        return 'select '+column+' from notes where '+text+' like concat("%",?,"%") and user_id=?'  
+    },
     update: function (condition) {
         return 'update notes set time=?,text=? where '+condition+'=?';
     },
@@ -84,6 +90,7 @@ var note_sql=new Note_sql();
 /*console.log(note_sql.select('*','user_id','limit 1 '));
 console.log(note_sql.select('*','user_id',' and rownum=1'));
 console.log(note_sql.select('*','id'));*/
+console.log(note_sql.select_fuzzy('text'));
 
 
 //显示首页
@@ -101,7 +108,7 @@ exports.login=function (req,res,next) {
             var telephone=fields.telephone;
             var message=fields.message;
             // console.log('================');
-            mysql.find(user_sql.select('*','telephone'),[telephone],function (err,result) {
+            mysql.find(user_sql.select('telephone'),[telephone],function (err,result) {
                 if (err) {
                     res.send('-3');//服务器错误
                     return;                   
@@ -126,7 +133,7 @@ exports.login=function (req,res,next) {
             var username=fields.username;
             var password=fields.password;
             var password_md5=md5(md5(password)+'792884274');
-            mysql.find(user_sql.select('*','username'),[username],function (err,result) {
+            mysql.find(user_sql.select('username'),[username],function (err,result) {
                 if (err) {
                     res.send('-3');//服务器错误
                     return;                   
@@ -209,6 +216,27 @@ exports.noteNotes=function (req,res,next) {
         res.json(obj);
     })
 }
+//搜索备忘录
+exports.noteSearch=function (req,res,next) {
+    var user_id=req.session.user_id;
+    var form=new formidable.IncomingForm();
+    form.parse(req,function (err,fields,files) {
+        var text=fields.text;  
+        console.log(text,user_id); 
+        mysql.find(note_sql.select_fuzzy('text'),[text,user_id],function (err,result) {
+            console.log('结果是：'+result);       
+            if (err||result.length==0) {
+                res.json('');
+                return;         
+            }
+            var obj={
+                'text': result
+            };
+            // console.log(result);
+            res.json(obj);
+        })
+    })
+}
 //获取用户信息页面
 exports.noteUser=function (req,res,next) {
     //没有登录
@@ -217,8 +245,8 @@ exports.noteUser=function (req,res,next) {
     }
     var username=req.session.username,
         telephone='';
-    mysql.find(user_sql.select('*','username'),[username],function (err,result) {
-        console.log(result[0].telephone);
+    mysql.find(user_sql.select('username'),[username],function (err,result) {
+        // console.log(result[0].telephone);
         if (err) {
             return;         
         }
@@ -244,7 +272,7 @@ exports.noteChangeUsername=function (req,res,next) {
         if (username==req.session.username) {
             res.send('2');//修改后的用户名和原用户名相同         
         } else{
-            mysql.find(user_sql.select('*','username'),[username],function (err0,result0) {
+            mysql.find(user_sql.select('username'),[username],function (err0,result0) {
                 if (err0) return;
                 if (result0.length!=0) {
                     res.send('-1');//用户名被占用
@@ -266,7 +294,7 @@ exports.noteChangeUsername=function (req,res,next) {
 exports.noteTelephone=function (req,res,next) {
     var username=req.session.username,
         telephone='';
-    mysql.find(user_sql.select('*','username'),[username],function (err,result) {
+    mysql.find(user_sql.select('username'),[username],function (err,result) {
         if (err) {
             return;         
         }
@@ -284,7 +312,7 @@ exports.bindTelephone=function (req,res,next) {
     form.parse(req,function (err,fields,files) {
         req.session.login='123456';
         // console.log('验证码：',req.session,req.sessionID);
-        mysql.find(user_sql.select('*','id'),[req.session.user_id],function (err,result) {
+        mysql.find(user_sql.select('id'),[req.session.user_id],function (err,result) {
             if (err) return; 
             console.log(result);  
         })
@@ -299,7 +327,7 @@ exports.bindTelephone=function (req,res,next) {
         var state=fields.state;
         console.log(telephone);
         // console.log('验证码：',message,req.session,req.sessionID);
-        mysql.find(user_sql.select('*','telephone'),[telephone],function (err,result) {
+        mysql.find(user_sql.select('telephone'),[telephone],function (err,result) {
             if (err) return;
             /*if (result.length!=0&&req.session.telephone) {
                 res.send('-1');//手机号已被注册
@@ -311,7 +339,7 @@ exports.bindTelephone=function (req,res,next) {
                     res.send('1');
                     return;
                 }
-                mysql.find(user_sql.select('*','id'),[user_id],function (err,result) {
+                mysql.find(user_sql.select('id'),[user_id],function (err,result) {
                     if (err) return; 
                     if (message==result[0].message) {
                         if (state=='bind') {
@@ -334,13 +362,13 @@ exports.bindTelephone=function (req,res,next) {
         })        
     })
 }   
-//修改用户的手机号
+/*//修改用户的手机号
 exports.noteChangeTelephone=function (req,res,next) {
-    /*var user_id=req.session.user_id;
+    var user_id=req.session.user_id;
     var form=new formidable.IncomingForm();
     form.parse(req,function (err,fields,files) {
         var password=md5(md5(fields.password)+'792884274');;
-        mysql.find(user_sql.select('*','id'),[user_id],function (err0,result0) {
+        mysql.find(user_sql.select('id'),[user_id],function (err0,result0) {
             if (err0) return;
             if (result0[0].password==password) {
                 res.send('2');//修改后的密码和原密码相同         
@@ -355,8 +383,8 @@ exports.noteChangeTelephone=function (req,res,next) {
             })
         })
 
-    })  */
-}
+    })
+}*/
 //显示修改用户密码页面
 exports.notePassword=function (req,res,next) {
     res.render('note-password',{})
@@ -368,7 +396,7 @@ exports.noteChangePassword=function (req,res,next) {
     form.parse(req,function (err,fields,files) {
         var old_password=md5(md5(fields.old_password)+'792884274');
         var new_password=md5(md5(fields.new_password)+'792884274');
-        mysql.find(user_sql.select('*','id'),[user_id],function (err0,result0) {
+        mysql.find(user_sql.select('id'),[user_id],function (err0,result0) {
             if (err0) return;
             if (result0[0].password!=old_password) {
                 res.send('-1');//旧密码不正确         
@@ -521,7 +549,7 @@ exports.teleCode=function (req,res,next) {
         // res.send('1');//发送成功 
          
 
-        mysql.find(user_sql.select('*','telephone'),[telephone],function (err0,result0) {
+        mysql.find(user_sql.select('telephone'),[telephone],function (err0,result0) {
             if(err0) return;
             //首页短信登录，为不登录状态。更换手机号时初次验证旧手机号，为登录状态。
             if (result0.length!==0) {
