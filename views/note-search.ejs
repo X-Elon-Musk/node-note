@@ -29,24 +29,26 @@
 </head>
 <body>
 
-<div class="container note-pages note-notes" id="notes">
+<div class="container note-search note-notes" id="notes">
     <header class="clearfix header">
-        <a href="/noteUser" class="user-info">
+        <a href="javascript:history.back(-1);" class="return-button">
+            <i class="fa fa-chevron-left fa-lg memorandum"></i>
+        </a>
+        <a href="/noteUser" class="user-info f_r">
             <i class="fa fa-user fa-lg"></i>
             <%=username%>
         </a>
-        <strong class="f_r edit-items edit-active" id="edit-items">编辑</strong>
     </header>
     <div class="content">
-        <h1 class="title">备忘录</h1>
+        <!-- <h1 class="title">备忘录</h1> -->
         <div class="note-search-input">
             <i class="fa fa-search fa-lg search-icon"></i>
             <input type="text" class="form-control" id="search" placeholder="搜索">
         </div>
         <div class="notes">
-            <ul class="notes-items" data-bind="foreach:{data: notes}">
+            <ul class="notes-items" data-bind="foreach:{data: notes}" id="notes-items">
                 <li class="notes-item clearfix" data-bind="attr:{id:id}">
-                    <div class="item-container" data-bind="zepto: $root.zepto">
+                   <div class="item-container f_l" data-bind="zepto: $root.zepto">
                         <div class="item-title">
                             <span data-bind="text:note_show.note_analyze(text).title"></span>
                         </div>
@@ -77,17 +79,34 @@
 
 
 <script type="text/javascript">
-    //显示搜索页面
-    function showSearch() {
-        $('#search').focus(function () {
-            window.location="/noteSearch"; 
+    $(function(){
+        $('#search').focus();
+    })
+    noteSearch();
+    //搜索
+    function noteSearch() {
+        $('#search').bind('input',function () {
+            $.post('/search',{
+                'text': $('#search').val()
+            },function (result) {
+                if (result) {
+                    // console.log($('.notes-items')[0]);
+                    
+                    
+                    ko.cleanNode(document.getElementById("notes-items"));
+                    // ko.observableArray([]);
+                    var vm=new ViewModel(result.text);
+                    ko.applyBindings(vm,document.getElementById("notes-items"));
+                    console.log(result);
+                } else{
+                    // alert('错误！');
+                }
+            })
         })
     }
-    showSearch();
     //数据绑定
     var ViewModel=function (result) {
         this.notes=ko.observableArray(result);
-        // this.init(result);
     }
     //备忘录显示
     var Note_show=function () {
@@ -96,7 +115,7 @@
     Note_show.prototype={
         constructor: Note_show,
         init: function () {
-            this.get_all();
+            // this.get_all();
         },
         //获取所有数据
         get_all: function () {
@@ -106,7 +125,7 @@
                 'success': function (result) {
                     if (result) {
                         var vm=new ViewModel(result.text);
-                        ko.applyBindings(vm);
+                        ko.applyBindings(vm,document.getElementById("notes-items"));
                     } else{
                         // alert('错误！');
                     }

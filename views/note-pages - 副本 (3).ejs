@@ -29,7 +29,7 @@
 </head>
 <body>
 
-<div class="container note-pages note-notes" id="notes">
+<div class="container note-pages" id="notes">
     <header class="clearfix header">
         <a href="/noteUser" class="user-info">
             <i class="fa fa-user fa-lg"></i>
@@ -39,14 +39,19 @@
     </header>
     <div class="content">
         <h1 class="title">备忘录</h1>
-        <div class="note-search-input">
+        <div class="note-search">
             <i class="fa fa-search fa-lg search-icon"></i>
             <input type="text" class="form-control" id="search" placeholder="搜索">
         </div>
         <div class="notes">
             <ul class="notes-items" data-bind="foreach:{data: notes}">
-                <li class="notes-item clearfix" data-bind="attr:{id:id}">
-                    <div class="item-container" data-bind="zepto: $root.zepto">
+                <li class="notes-item clearfix" data-bind="attr:{id:id}" style="overflow: hidden;">
+                    <!-- <div class="item-container f_l" data-bind="event: {touchstart: $root.actionStart,touchmove: $root.actionMove,touchend: $root.actionEnd}"> -->
+                    <!-- <div class="item-container f_l" data-bind="event: {tap: $root.tap}"> -->
+                    <!-- <div class="item-container f_l" data-bind="tap: $root.tap,swipeLeft: $root.swipeLeft,"> -->
+                    <div class="item-container f_l" data-bind="zepto: $root.zepto" style="position: absolute;left: 0;top: 4px;">
+                    <!-- <div class="item-container f_l"> -->
+                    <!-- <div class="item-container f_l" data-bind="event:{click: $root.actionClick}"> -->
                         <div class="item-title">
                             <span data-bind="text:note_show.note_analyze(text).title"></span>
                         </div>
@@ -55,7 +60,8 @@
                             <span data-bind="text:note_show.note_analyze(text).content" class="item-text"></span>
                         </div>
                     </div>
-                    <div class="item-delete" style="" data-bind="delete_note: $root.delete_note">
+                    <!-- <div class="item-delete f_l" data-bind="event: {click: $root.actionDelete}"> -->
+                    <div class="item-delete f_l" style="height: 46px; width: 46px;right: -50px;position: absolute;top: 4px;" data-bind="zepto: $root.zepto">
                         <i class="fa fa-trash fa-lg"></i>
                     </div>
                 </li>
@@ -77,13 +83,22 @@
 
 
 <script type="text/javascript">
-    //显示搜索页面
-    function showSearch() {
-        $('#search').focus(function () {
-            window.location="/noteSearch"; 
+    noteSearch();
+    //搜索
+    function noteSearch() {
+        $('#search').bind('input',function () {
+            $.post('noteSearch',{
+                'text': $('#search').val()
+            },function (result) {
+                if (result) {
+                    // var vm=new ViewModel(result.text);
+                    // ko.applyBindings(vm);
+                } else{
+                    // alert('错误！');
+                }
+            })
         })
     }
-    showSearch();
     //数据绑定
     var ViewModel=function (result) {
         this.notes=ko.observableArray(result);
@@ -234,11 +249,8 @@
     //自定义‘zepto’、删除单条备忘录事件
     ko.bindingHandlers.zepto={
         init: function (element) {
+            // console.log(element);
             zepto.init(element);
-        }
-    };
-    ko.bindingHandlers.delete_note={
-        init: function (element) {
             delete_note.init(element);
         }
     };

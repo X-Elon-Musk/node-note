@@ -217,7 +217,7 @@ exports.noteNotes=function (req,res,next) {
     })
 }
 //搜索备忘录
-exports.noteSearch=function (req,res,next) {
+exports.search=function (req,res,next) {
     var user_id=req.session.user_id;
     var form=new formidable.IncomingForm();
     form.parse(req,function (err,fields,files) {
@@ -413,6 +413,15 @@ exports.noteChangePassword=function (req,res,next) {
 
     })  
 }
+//显示搜索页面
+exports.noteSearch=function (req,res,next) {
+    res.render('note-search',{
+        'active': 'search',
+        'login': req.session.login,
+        'username': req.session.username
+    })
+}
+    
 //显示编辑页面(在无内容和有内容情况下，渲染页面)
 exports.noteEdit=function (req,res,next) {
     var id=req.params['id'];
