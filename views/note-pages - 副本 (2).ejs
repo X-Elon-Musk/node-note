@@ -83,6 +83,19 @@
 
 
 <script type="text/javascript">
+    /*//发表
+    $('.record').click(function () {
+        $.post('/record',{
+            'content': $('.text').val()
+        },function (result) {
+            // if (result.result==-1) {
+                
+            // } else if(result.result==1){
+            //     console.log(1);
+            // }      
+        })   
+    })*/
+
     noteSearch();
     //搜索
     function noteSearch() {
@@ -99,6 +112,29 @@
             })
         })
     }
+        
+
+
+
+
+
+    /*noteNotes();
+    var notes;
+    //获取个人所有备忘录文本
+    function noteNotes() {
+        $.ajax({
+            'url': '/noteNotes',
+            'type': 'get',
+            'success': function (result) {
+                if (result) {
+                    var vm=new ViewModel(result.text);
+                    ko.applyBindings(vm);
+                } else{
+                    // alert('错误！');
+                }
+            }
+        })
+    }*/
     //数据绑定
     var ViewModel=function (result) {
         this.notes=ko.observableArray(result);
@@ -148,6 +184,34 @@
         }     
     }
     var note_show=new Note_show();
+
+    // note_show.get_all();
+    /*//时间格式修改
+    function time_change(text) {
+        var content=text.replace(/([^\u0000-\u00FF])/g,'/')
+        return content;
+    }
+    //获得备忘笔记的头部和内容部分
+    function note_analyze(text) {
+        var obj={};
+        var arr=text.split('\r\n');
+        if (arr[0].length>=20) {
+            obj.title=text.substring(0,19);
+            obj.content=text.substring(20);      
+        } else{
+            obj.title=arr[0];
+            obj.content=text.substring(arr[0].length); 
+        }
+        return obj;
+    }*/
+    
+    /*ViewModel.prototype={
+        constructor: ViewModel,
+        init: function (result) {
+            this.notes=ko.observableArray(result);
+        }, 
+    }*/
+    
     //zepto手势事件
     var Zepto=function () {};
     Zepto.prototype={
@@ -243,6 +307,192 @@
             delete_note.init(element);
         }
     };
+    /*//定义ViewModel   
+    function ViewModel(result) {
+        var self=this;
+        var number=0,click=true;
+        self.notes=ko.observableArray(result);
+        // self.init();
+        self.actionClick=function () {
+            
+        }
+        self.init=function () {
+            self.pageX=0;
+            self.disX=0;
+            // self.tap();
+            // self.pageY=0;
+            // self.disY=0;
+        };
+        self.tap=function () {
+            $('.notes-item').tap(function () {
+                console.log('点击了左滑');   
+            })
+        }
+        //单击备忘笔记，滑动备忘笔记  
+        self.actionClick=function (event) {
+            // self.init();
+            moveBack(event.currentTarget);
+            var target=$(event.currentTarget);
+            self.pageX=event.touches[0].pageX;
+            // self.pageY=event.touches[0].pageY;
+        }; 
+        //双击备忘笔记，进入编辑页面 
+        self.actionDblclick=function (event) {
+            var element=$(event.currentTarget).parent(),
+                id=element.attr('id');
+            window.location="/noteEdit/"+id; 
+        }; 
+        //手指接触到备忘笔记,双击和单击处理
+        self.actionStart=function (element,index,data) {
+            self.init();
+            // moveBack(event.currentTarget);
+            // var target=$(event.currentTarget);
+            // self.pageX=event.touches[0].pageX;
+            // self.pageY=event.touches[0].pageY;
+            // event.stopPropagation();
+            if(click){
+                setTimeout(function(){      
+                    number=0;
+                    click=true;
+                },400);
+                click=false;
+            }
+            number++;
+            if(number>=2){
+                self.actionDblclick(event);
+            } else{
+                self.actionClick(event);
+            }
+        };
+        //手指滑动备忘笔记
+        self.actionMove=function (element,index,data) {
+            // event.preventDefault();
+            self.disX=event.touches[0].pageX-self.pageX;
+            self.disY=event.touches[0].pageY-self.pageY;
+            var x=self.disX,y=self.disY;
+            var w = x<0?x*-1:x;     //x轴的滑动值
+            var h = y<0?y*-1:y;     //y轴的滑动值
+            console.log(w,h);
+            if(w>h){ 
+                console.log(222);               //如果是在x轴中滑动
+                event.preventDefault();
+            }
+            var target=$(event.currentTarget),left=self.disX; 
+            if (left>0) {
+                left=0; 
+                self.disX=0;        
+            } else if(left<=-target.next().height()){
+                left=-target.next().height();
+                self.disX=-target.next().height(); 
+            }
+            target.css({
+                'margin-left': left+'px'
+            })
+            target.next().css({
+                'width': Math.abs(left)+'px'
+            })
+        };
+        //手指离开备忘笔记
+        self.actionEnd=function () {
+            var target=$(event.currentTarget),
+                maxWidth=target.next().height(),
+                left=Math.abs(self.disX);
+            //没有移动超过方块最大宽度一半或者原来是打开状态时，关闭删除部分；超过方块最大宽度一半且小于等于最大宽度时，打开删除部分
+            if ((left>0&&left<maxWidth/2)||target[0].back==true) {
+                target.removeClass('active').animate({'margin-left':'0'},'fast',function () {
+                    target[0].back=false;
+                });            
+                target.next().animate({'width':'0'},'fast');
+                actionEdit(false);
+            } else if(left>=maxWidth/2&&left<=maxWidth){
+                target.addClass('active').animate({'margin-left':-maxWidth+'px'},'fast',function () {
+                    target[0].back=true;
+                });       
+                target.next().animate({'width':maxWidth+'px'},'fast');
+                actionEdit(true);
+            }
+        }; 
+        //点击删除备忘笔记
+        self.actionDelete=function () {
+            var element=$(event.currentTarget).parent(),
+                id=element.attr('id');
+            $.post('/delete/'+id,{
+                'follow': false
+            },function (result) {
+                if (result=='1') {
+                    //数据库删除数据后，删除页面中的响应的DOM
+                    var number=parseFloat($('#number').html());
+                    element.remove();
+                    $('#number').html(--number); 
+                } else{
+                    return;
+                }
+            })
+        };
+    }*/
+    //备忘录都移动会原来位置，排除当前已经点击的对象
+    function moveBack(now) {
+        if ($('.item-container')) {
+            $('.item-container').each(function (index,element) {
+                if ($(now)[0]!=$(element)[0]&&$(this).hasClass('active')) {
+                    $(this)[0].back=false;
+                    $(this).removeClass('active').animate({'margin-left':'0'},'fast');       
+                    $(this).next().animate({'width':'0'},'fast');
+                }
+            })
+        }
+    }
+    //编辑按钮操作
+    function actionEdit(edit) {
+        if (edit) {
+            //点击完成按钮，关闭删除部分
+            $('.edit-items').removeClass('edit-active').addClass('edit-inactive').html('完成');   
+            $('.edit-items.edit-inactive').click(function () {
+                moveBack();
+                $('.edit-items').removeClass('edit-inactive').addClass('edit-active').html('编辑');
+            })             
+        } else{
+            $('.edit-items').removeClass('edit-inactive').addClass('edit-active').html('编辑');
+        }    
+    }
+    editActive();
+    //头部编辑按钮操作
+    function editActive() {
+        $('.edit-items.edit-active').click(function () {
+            // console.log(2);
+        })
+    }
+        
+    
+
+
+
+    /*var Note_pages=function () {
+        this.init();
+    }
+    Note_pages.prototype={
+        constructor: Note_pages,
+        init: function () {
+            this.allNotes();
+        },
+        //获取个人所有备忘录文本
+        allNotes: function () {
+            $.ajax({
+                'url': '/noteNotes',
+                'type': 'get',
+                'success': function (result) {
+                    if (result) {
+                        var vm=new ViewModel(result.text);
+                        ko.applyBindings(vm);
+                    } else{
+                        // alert('错误！');
+                    }
+                }
+            })
+        }
+             
+    }    */
+              
 </script>
 </body>
 </html>
