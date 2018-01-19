@@ -64,7 +64,7 @@
     </div>
     <div class="footer clearfix">
         <span class="notes-number">
-            <strong data-bind="text:notes().length" id="number"></strong>个备忘录
+            <strong data-bind="text: notes().length" id="number"></strong>个备忘录
         </span>
         <a href="/noteEdit" class="f_r edit" id="edit">
             <i class="fa fa-edit fa-lg"></i>
@@ -105,7 +105,8 @@
                             notes_list={
                                 notes: ko.observableArray()
                             }
-                            ko.applyBindings(notes_list,document.getElementById("notes-items"));             
+                            // ko.applyBindings(notes_list,document.getElementById("notes-items"));             
+                            ko.applyBindings(notes_list);             
                         }
                         notes_list.notes(result.text);
                     } else{
