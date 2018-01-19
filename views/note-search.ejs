@@ -46,7 +46,7 @@
             <input type="text" class="form-control" id="search" placeholder="搜索">
         </div>
         <div class="notes">
-            <ul class="notes-items" data-bind="foreach:{data: notes},visible: display" id="notes-items">
+            <ul class="notes-items" data-bind="foreach:{data: notes},visible: notes().length>0" id="notes-items">
                 <li class="notes-item clearfix" data-bind="attr:{id:id}">
                    <div class="item-container f_l" data-bind="zepto: $root.zepto">
                         <div class="item-title">
@@ -82,7 +82,7 @@
     Note_search.prototype={
         constructor: Note_search,
         init: function () {
-            this.bind('',false);
+            this.bind('');
             this.search();
         },
         //搜索
@@ -96,32 +96,28 @@
         search_ajax: function () {
             var _this=this;
             if ($('#search').val()=='') {
-                this.bind('',false); 
+                this.bind(''); 
                 return;            
             }
             $.post('/search',{
                 'text': $('#search').val()
             },function (result) {
-                if (result) {
-                    if (JSON.parse(result).text&&JSON.parse(result).text.length>0) {
-                        _this.bind(JSON.parse(result).text,true);            
-                    } else{
-                        _this.bind('',false); 
-                    }
+                if (result!=='-2') {
+                    _this.bind(JSON.parse(result).text);
+                } else{
+                    alert('错误！'); 
                 }
             })
         },
         //数据绑定
-        bind: function (result,judge) {
+        bind: function (result) {
             if (!notes_list) {
                 notes_list={
-                    notes: ko.observableArray(),
-                    display: ko.observable()
+                    notes: ko.observableArray()
                 }
                 ko.applyBindings(notes_list,document.getElementById("notes-items"));             
             }
             notes_list.notes(result);
-            notes_list.display(judge); 
         }
     }
     var note_search=new Note_search(); 

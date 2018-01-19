@@ -87,10 +87,6 @@ Note_sql.prototype={
 }
 var user_sql=new User_sql();
 var note_sql=new Note_sql();
-/*console.log(note_sql.select('*','user_id','limit 1 '));
-console.log(note_sql.select('*','user_id',' and rownum=1'));
-console.log(note_sql.select('*','id'));*/
-// console.log(note_sql.select_fuzzy('text'));
 
 
 //显示首页
@@ -103,11 +99,9 @@ exports.login=function (req,res,next) {
     form.parse(req,function (err,fields,files) {
         //判断是短信登录还是密码登录
         var mode=fields.mode;
-        // console.log(mode);
         if (mode=='message') {
             var telephone=fields.telephone;
             var message=fields.message;
-            // console.log('================');
             mysql.find(user_sql.select('telephone'),[telephone],function (err,result) {
                 if (err) {
                     res.send('-3');//服务器错误
@@ -117,8 +111,6 @@ exports.login=function (req,res,next) {
                     res.send('-1');//手机号未注册
                     return;
                 }
-                // req.session.message='908370';
-                console.log(message,result[0].message);
                 if (message==result[0].message) {
                     req.session.username=result[0].username;
                     req.session.user_id=result[0].id;
@@ -206,14 +198,13 @@ exports.notePages=function (req,res,next) {
 exports.noteNotes=function (req,res,next) {
     var user_id=req.session.user_id;
     mysql.find(note_sql.select('*','user_id'),[user_id],function (err,result) {
-        if (err||result.length==0) {
-            res.json('');
-            return;         
+        if (err) {
+            res.send('-2');
+            return;           
         }
         var obj={
             'text': result
         };
-        console.log(result);
         res.json(obj);
     })
 }
@@ -221,21 +212,16 @@ exports.noteNotes=function (req,res,next) {
 exports.search=function (req,res,next) {
     var user_id=req.session.user_id;
     var form=new formidable.IncomingForm();
-    console.log('===================');
     form.parse(req,function (err,fields,files) {
-        console.log(fields);
         var text=fields.text;  
-        // console.log(text,user_id); 
         mysql.find(note_sql.select_fuzzy('text'),[text,user_id],function (err,result) {
-            // console.log('结果是：'+result);       
-            if (err||result.length==0) {
-                res.json('');
-                return;         
+            if (err) {
+                res.send('-2');
+                return;           
             }
             var obj={
                 'text': result
             };
-            console.log(result);
             res.json(obj);
         })
     })
@@ -249,7 +235,6 @@ exports.noteUser=function (req,res,next) {
     var username=req.session.username,
         telephone='';
     mysql.find(user_sql.select('username'),[username],function (err,result) {
-        // console.log(result[0].telephone);
         if (err) {
             return;         
         }
@@ -263,7 +248,6 @@ exports.noteUser=function (req,res,next) {
 }
 //显示修改用户名页面
 exports.noteUsername=function (req,res,next) {
-    // req.session.login='123456';
     res.render('note-username',{})
 }
 //修改用户的用户名
@@ -557,7 +541,7 @@ exports.teleCode=function (req,res,next) {
     form.parse(req,function (err,fields,files) {
         var telephone=fields.telephone;
         var message=createParam();
-        console.log(message);
+        // console.log(message);
         // res.send('1');//发送成功 
          
 
