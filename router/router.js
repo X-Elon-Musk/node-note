@@ -90,7 +90,7 @@ var note_sql=new Note_sql();
 /*console.log(note_sql.select('*','user_id','limit 1 '));
 console.log(note_sql.select('*','user_id',' and rownum=1'));
 console.log(note_sql.select('*','id'));*/
-console.log(note_sql.select_fuzzy('text'));
+// console.log(note_sql.select_fuzzy('text'));
 
 
 //显示首页
@@ -213,6 +213,7 @@ exports.noteNotes=function (req,res,next) {
         var obj={
             'text': result
         };
+        console.log(result);
         res.json(obj);
     })
 }
@@ -220,11 +221,13 @@ exports.noteNotes=function (req,res,next) {
 exports.search=function (req,res,next) {
     var user_id=req.session.user_id;
     var form=new formidable.IncomingForm();
+    console.log('===================');
     form.parse(req,function (err,fields,files) {
+        console.log(fields);
         var text=fields.text;  
-        console.log(text,user_id); 
+        // console.log(text,user_id); 
         mysql.find(note_sql.select_fuzzy('text'),[text,user_id],function (err,result) {
-            console.log('结果是：'+result);       
+            // console.log('结果是：'+result);       
             if (err||result.length==0) {
                 res.json('');
                 return;         
@@ -232,7 +235,7 @@ exports.search=function (req,res,next) {
             var obj={
                 'text': result
             };
-            // console.log(result);
+            console.log(result);
             res.json(obj);
         })
     })
@@ -325,7 +328,7 @@ exports.bindTelephone=function (req,res,next) {
         var telephone=fields.telephone;
         var message=fields.message;
         var state=fields.state;
-        console.log(telephone);
+        // console.log(telephone);
         // console.log('验证码：',message,req.session,req.sessionID);
         mysql.find(user_sql.select('telephone'),[telephone],function (err,result) {
             if (err) return;

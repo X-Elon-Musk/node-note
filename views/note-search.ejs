@@ -40,13 +40,13 @@
         </a>
     </header>
     <div class="content">
-        <!-- <h1 class="title">备忘录</h1> -->
+        <!-- <h1 class="title">备忘录搜索</h1> -->
         <div class="note-search-input">
             <i class="fa fa-search fa-lg search-icon"></i>
             <input type="text" class="form-control" id="search" placeholder="搜索">
         </div>
         <div class="notes">
-            <ul class="notes-items" data-bind="foreach:{data: notes}" id="notes-items">
+            <ul class="notes-items" data-bind="foreach:{data: notes},visible: display" id="notes-items">
                 <li class="notes-item clearfix" data-bind="attr:{id:id}">
                    <div class="item-container f_l" data-bind="zepto: $root.zepto">
                         <div class="item-title">
@@ -64,14 +64,6 @@
             </ul>
         </div>
     </div>
-    <div class="footer clearfix">
-        <span class="notes-number">
-            <strong data-bind="text:notes().length" id="number"></strong>个备忘录
-        </span>
-        <a href="/noteEdit" class="f_r edit" id="edit">
-            <i class="fa fa-edit fa-lg"></i>
-        </a>
-    </div>
 </div>
 
 
@@ -82,55 +74,64 @@
     $(function(){
         $('#search').focus();
     })
-    noteSearch();
-    //搜索
-    function noteSearch() {
-        $('#search').bind('input',function () {
+    var notes_list;
+    //备忘录搜索
+    var Note_search=function () {
+        this.init();
+    }
+    Note_search.prototype={
+        constructor: Note_search,
+        init: function () {
+            this.bind('',false);
+            this.search();
+        },
+        //搜索
+        search: function () {
+            var _this=this;
+            $('#search').bind('input',function () {
+                _this.search_ajax();
+            })
+        },
+        //数据请求
+        search_ajax: function () {
+            var _this=this;
+            if ($('#search').val()=='') {
+                this.bind('',false); 
+                return;            
+            }
             $.post('/search',{
                 'text': $('#search').val()
             },function (result) {
                 if (result) {
-                    // console.log($('.notes-items')[0]);
-                    
-                    
-                    ko.cleanNode(document.getElementById("notes-items"));
-                    // ko.observableArray([]);
-                    var vm=new ViewModel(result.text);
-                    ko.applyBindings(vm,document.getElementById("notes-items"));
-                    console.log(result);
-                } else{
-                    // alert('错误！');
-                }
-            })
-        })
-    }
-    //数据绑定
-    var ViewModel=function (result) {
-        this.notes=ko.observableArray(result);
-    }
-    //备忘录显示
-    var Note_show=function () {
-        this.init();
-    };
-    Note_show.prototype={
-        constructor: Note_show,
-        init: function () {
-            // this.get_all();
-        },
-        //获取所有数据
-        get_all: function () {
-            $.ajax({
-                'url': '/noteNotes',
-                'type': 'get',
-                'success': function (result) {
-                    if (result) {
-                        var vm=new ViewModel(result.text);
-                        ko.applyBindings(vm,document.getElementById("notes-items"));
+                    if (JSON.parse(result).text&&JSON.parse(result).text.length>0) {
+                        _this.bind(JSON.parse(result).text,true);            
                     } else{
-                        // alert('错误！');
+                        _this.bind('',false); 
                     }
                 }
             })
+        },
+        //数据绑定
+        bind: function (result,judge) {
+            if (!notes_list) {
+                notes_list={
+                    notes: ko.observableArray(),
+                    display: ko.observable()
+                }
+                ko.applyBindings(notes_list,document.getElementById("notes-items"));             
+            }
+            notes_list.notes(result);
+            notes_list.display(judge); 
+        }
+    }
+    var note_search=new Note_search(); 
+
+    //备忘录显示
+    var Note_show=function () {};
+    Note_show.prototype={
+        constructor: Note_show,
+        init: function () {
+
         },
         //时间格式修改   
         time_change: function (text) {
@@ -157,108 +158,24 @@
     Zepto.prototype={
         constructor: Zepto,
         init: function (element) {
-            this.max_width='-46px';
             //事件调用
             this.zepto_tap(element);
-            this.zepto_swipeLeft(element);
-            this.zepto_swipeRight(element);
         },
         //点击
         zepto_tap: function (element) {
             var _this=this;
             $(element).tap(function () {
-                console.log(_this.max_width,'点击了'); 
-                if ($(this).hasClass('active')) {
-                    _this.move_back($(this)); 
-                    return;  
-                }  
                 var id=$(this).parent().attr('id');
                 window.location="/noteEdit/"+id; 
             })
-        },
-        //左滑
-        zepto_swipeLeft: function (element) {
-            var _this=this;
-            $(element).swipeLeft(function () {
-                console.log('左滑');  
-                _this.all_back(element);
-                _this.move_active($(this));  
-            })
-        },
-        //右滑
-        zepto_swipeRight: function (element) {
-            var _this=this;
-            $(element).swipeRight(function () {
-                if ($(this).hasClass('active')) {
-                    _this.move_back($(this)); 
-                    return;  
-                }   
-            })
-        },
-        //其余的滑回原来位置
-        all_back: function (now_element) {
-            var _this=this;
-            if ($('.item-container')) {
-                $('.item-container').each(function (index,element) {
-                    if ($(now_element)[0]!=$(element)[0]&&$(this).hasClass('active')) {
-                        _this.move_back($(this));
-                    }
-                })
-            }
-        },
-        //滑回原来位置
-        move_back: function (element) {
-            var _this=this;
-            $(element).removeClass('active').animate({'left': '0'},'fast');       
-            $(element).next().animate({'right': _this.max_width},'fast'); 
-        },
-        //左滑滑出
-        move_active: function (element) {
-            var _this=this;
-            $(element).addClass('active').animate({'left': _this.max_width},'fast');       
-            $(element).next().animate({'right': '0px'},'fast');
-        }          
+        }
     }  
     var zepto=new Zepto();
-    //Delete_note删除单条备忘录事件
-    var Delete_note=function () {};
-    Delete_note.prototype={
-        constructor: Delete_note,
-        init: function (element) {
-            this.delete(element);
-        },
-        //点击，删除数据库数据和单条备忘录
-        delete: function (element) {
-            var _this=this;
-            $(element).tap(function () {
-                var parent=$(this).parent(),
-                    id=parent.attr('id');
-                $.post('/delete/'+id,{
-                    'follow': false
-                },function (result) {
-                    if (result=='1') {
-                        //数据库删除数据后，删除页面中的响应的DOM
-                        var number=parseFloat($('#number').html());
-                        parent.remove();
-                        $('#number').html(--number); 
-                    } else{
-                        return;
-                    }
-                })
-            })
-        }
-    }
-    var delete_note=new Delete_note();
     //备忘录操作
-    //自定义‘zepto’、删除单条备忘录事件
+    //自定义‘zepto’事件
     ko.bindingHandlers.zepto={
         init: function (element) {
             zepto.init(element);
-        }
-    };
-    ko.bindingHandlers.delete_note={
-        init: function (element) {
-            delete_note.init(element);
         }
     };
 </script>
