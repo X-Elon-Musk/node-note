@@ -448,7 +448,6 @@ exports.record=function (req,res,next) {
     form.parse(req, function (err,fields,files) {
         //存入user_id、text、time
         var data=fields.data;
-        // console.log(data);
         var arr=data.split('&');
         var time=arr[0].split('=')[1];
         var text=arr[1].split('=')[1];
