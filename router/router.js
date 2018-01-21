@@ -307,7 +307,6 @@ exports.bindTelephone=function (req,res,next) {
     
     var user_id=req.session.user_id;
     var form=new formidable.IncomingForm();
-    // console.log('验证码：',req.session.message);
     form.parse(req,function (err,fields,files) {
         var telephone=fields.telephone;
         var message=fields.message;
