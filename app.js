@@ -66,3 +66,6 @@ app.post('/teleCode',router.teleCode);
 
 
 app.listen(3100);
+app.listen(app.get('port'), function () {
+    console.log('Express server listening on port ' + app.get('port'));
+});
