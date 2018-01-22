@@ -18,6 +18,8 @@ app.use(express.static("./public"));
 
 
 
+
+
 //显示首页(登录页面)
 app.get('/',router.index);
 //登录
