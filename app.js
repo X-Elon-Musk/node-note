@@ -48,8 +48,6 @@ app.post('/noteChangePassword',router.noteChangePassword);
 app.get('/noteTelephone',router.noteTelephone);
 //用户绑定手机号
 app.post('/bindTelephone',router.bindTelephone);
-/*//修改用户的手机号
-app.post('/noteChangeTelephone',router.noteChangeTelephone);*/
 //显示搜索页面
 app.get('/noteSearch',router.noteSearch);
 //显示编辑页面
@@ -67,5 +65,5 @@ app.post('/teleCode',router.teleCode);
 
 app.listen(3100);
 app.listen(app.get('port'), function () {
-    console.log('Express server listening on port ' + app.get('port'));
+    console.log('node-note');
 });

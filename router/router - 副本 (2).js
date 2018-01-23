@@ -1,7 +1,7 @@
 var formidable=require('formidable');
 var path=require('path');
 var fs=require('fs');
-var mysql=require('../model/sql-config.js').mysql;
+var mysql=require('../model/sql-config.js');
 var md5=require('../model/md5.js');
 var svgCaptcha = require('svg-captcha');
 const SMSClient = require('@alicloud/sms-sdk')
@@ -10,6 +10,33 @@ const accessKeyId = 'LTAINkfU7xNmo0qb'
 const secretAccessKey = 'WNce8J1x0TQFkb57jYOnXW2xyM8pD7'
 
 
+
+
+/*//sql命令
+var user_sql={
+    insert: 'insert into users(username,password) values(?,?)',
+    queryAll: 'select * from users',
+    getInfo: 'select * from users where username=?',
+    getInfoById: 'select * from users where id=?',
+    getUser: 'select * from users where telephone=?',
+    getId: 'select id from users where username=?',
+    getPassword: 'select password from users where username=?',
+    changeUsername: 'update users set username=? where id=?',
+    changeTelephone: 'update users set telephone=? where id=?',
+    changeMessageByTel: 'update users set message=? where telephone=?',
+    changeMessageById: 'update users set message=? where id=?',
+    changePassword: 'update users set password=? where id=?'
+}
+var note_sql={
+    insert: 'insert into notes(user_id,text,time) values(?,?,?)',
+    queryAll: 'select * from notes',
+    getNotes: 'select * from notes where user_id=?',
+    getTop: 'select * from notes limit 1',
+    getNoteByid: 'select * from notes where id=?',
+    delete: 'delete from notes where id=?',
+    deleteUpdate: 'select * from notes where id=(select min(id) from notes where id>?)',
+    updateNote: 'update notes set time=?,text=? where id=?'
+}*/
 //操作用户数据库
 var User_sql=function () {};
 User_sql.prototype={
@@ -75,7 +102,7 @@ exports.login=function (req,res,next) {
         if (mode=='message') {
             var telephone=fields.telephone;
             var message=fields.message;
-            mysql(user_sql.select('telephone'),[telephone],function (err,result) {
+            mysql.find(user_sql.select('telephone'),[telephone],function (err,result) {
                 if (err) {
                     res.send('-3');//服务器错误
                     return;                   
@@ -98,7 +125,7 @@ exports.login=function (req,res,next) {
             var username=fields.username;
             var password=fields.password;
             var password_md5=md5(md5(password)+'792884274');
-            mysql(user_sql.select('username'),[username],function (err,result) {
+            mysql.find(user_sql.select('username'),[username],function (err,result) {
                 if (err) {
                     res.send('-3');//服务器错误
                     return;                   
@@ -135,7 +162,7 @@ exports.register=function (req,res,next) {
             res.send('-2');//验证码不对
             return;            
         }
-        mysql(user_sql.select('username'),[username],function (err,result) {
+        mysql.find(user_sql.select('username'),[username],function (err,result) {
             if (err) {
                 res.send('-3');//服务器错误
                 return;         
@@ -147,7 +174,7 @@ exports.register=function (req,res,next) {
             //设置md5加密
             password=md5(md5(password)+'792884274');
             //名字没有被占用
-            mysql(user_sql.insert('username','password'),[username,password],function (err,result) {
+            mysql.insertOne(user_sql.insert('username','password'),[username,password],function (err,result) {
                 if (err) {
                     res.send('-3');
                     return;                   
@@ -170,7 +197,7 @@ exports.notePages=function (req,res,next) {
 //获取个人所有备忘录文本
 exports.noteNotes=function (req,res,next) {
     var user_id=req.session.user_id;
-    mysql(note_sql.select('*','user_id'),[user_id],function (err,result) {
+    mysql.find(note_sql.select('*','user_id'),[user_id],function (err,result) {
         if (err) {
             res.send('-2');
             return;           
@@ -187,7 +214,7 @@ exports.search=function (req,res,next) {
     var form=new formidable.IncomingForm();
     form.parse(req,function (err,fields,files) {
         var text=fields.text;  
-        mysql(note_sql.select_fuzzy('text'),[text,user_id],function (err,result) {
+        mysql.find(note_sql.select_fuzzy('text'),[text,user_id],function (err,result) {
             if (err) {
                 res.send('-2');
                 return;           
@@ -207,7 +234,7 @@ exports.noteUser=function (req,res,next) {
     }
     var username=req.session.username,
         telephone='';
-    mysql(user_sql.select('username'),[username],function (err,result) {
+    mysql.find(user_sql.select('username'),[username],function (err,result) {
         if (err) {
             return;         
         }
@@ -232,13 +259,13 @@ exports.noteChangeUsername=function (req,res,next) {
         if (username==req.session.username) {
             res.send('2');//修改后的用户名和原用户名相同         
         } else{
-            mysql(user_sql.select('username'),[username],function (err0,result0) {
+            mysql.find(user_sql.select('username'),[username],function (err0,result0) {
                 if (err0) return;
                 if (result0.length!=0) {
                     res.send('-1');//用户名被占用
                     return;
                 }
-                mysql(user_sql.update('username','id'),[username,user_id],function (err1,result1) {
+                mysql.update(user_sql.update('username','id'),[username,user_id],function (err1,result1) {
                     if (err1) {
                         return;         
                     } else{
@@ -254,7 +281,7 @@ exports.noteChangeUsername=function (req,res,next) {
 exports.noteTelephone=function (req,res,next) {
     var username=req.session.username,
         telephone='';
-    mysql(user_sql.select('username'),[username],function (err,result) {
+    mysql.find(user_sql.select('username'),[username],function (err,result) {
         if (err) {
             return;         
         }
@@ -275,7 +302,7 @@ exports.bindTelephone=function (req,res,next) {
         var state=fields.state;
         // console.log(telephone);
         // console.log('验证码：',message,req.session,req.sessionID);
-        mysql(user_sql.select('telephone'),[telephone],function (err,result) {
+        mysql.find(user_sql.select('telephone'),[telephone],function (err,result) {
             if (err) return;
             /*if (result.length!=0&&req.session.telephone) {
                 res.send('-1');//手机号已被注册
@@ -287,11 +314,11 @@ exports.bindTelephone=function (req,res,next) {
                     res.send('1');
                     return;
                 }
-                mysql(user_sql.select('id'),[user_id],function (err,result) {
+                mysql.find(user_sql.select('id'),[user_id],function (err,result) {
                     if (err) return; 
                     if (message==result[0].message) {
                         if (state=='bind') {
-                            mysql(user_sql.update('telephone','id'),[telephone,user_id],function (err,result) {
+                            mysql.update(user_sql.update('telephone','id'),[telephone,user_id],function (err,result) {
                                 if (err) return;  
                                 req.session.telephone=telephone;
                                 res.send('1');//绑定成功
@@ -321,13 +348,13 @@ exports.noteChangePassword=function (req,res,next) {
     form.parse(req,function (err,fields,files) {
         var old_password=md5(md5(fields.old_password)+'792884274');
         var new_password=md5(md5(fields.new_password)+'792884274');
-        mysql(user_sql.select('id'),[user_id],function (err0,result0) {
+        mysql.find(user_sql.select('id'),[user_id],function (err0,result0) {
             if (err0) return;
             if (result0[0].password!=old_password) {
                 res.send('-1');//旧密码不正确         
                 return;
             }
-            mysql(user_sq.update('password','id'),[new_password,user_id],function (err1,result1) {
+            mysql.update(user_sq.update('password','id'),[new_password,user_id],function (err1,result1) {
                 if (err1) {
                     return;         
                 } else{
@@ -351,7 +378,7 @@ exports.noteSearch=function (req,res,next) {
 exports.noteEdit=function (req,res,next) {
     var id=req.params['id'];
     if (id) {
-        mysql(note_sql.select('*','id'),[id],function (err,result) {
+        mysql.find(note_sql.select('*','id'),[id],function (err,result) {
             if (result.length!==0) {
                 res.render('note-edit',{
                     'active': 'note-edit',
@@ -391,7 +418,7 @@ exports.record=function (req,res,next) {
         var text=arr[1].split('=')[1];
         if (id) {
             time=getNowFormatDate(new Date());
-            mysql(note_sql.update('id'),[time,text,id],function (err,result) {
+            mysql.update(note_sql.update('id'),[time,text,id],function (err,result) {
                 if (err) {
                     res.send('-3');
                     return;         
@@ -399,7 +426,7 @@ exports.record=function (req,res,next) {
                 res.send('1');//更改成功
             })       
         } else{
-            mysql(note_sql.insert('user_id','text','time'),[req.session.user_id,text,time],function (err,result) {
+            mysql.insertOne(note_sql.insert('user_id','text','time'),[req.session.user_id,text,time],function (err,result) {
                 if (err) {
                     res.send('-3');
                     return;         
@@ -419,7 +446,7 @@ exports.delete=function (req,res,next) {
         var follow=fields.follow;
         //判断是否有后续操作(是否要显示下一条数据)
         if (follow=='true') {
-            mysql(note_sql.delete_select(),[id,user_id],function (err,result0) {
+            mysql.find(note_sql.delete_select(),[id,user_id],function (err,result0) {
                 if (err) {
                     res.send('-3');
                     return;         
@@ -429,10 +456,10 @@ exports.delete=function (req,res,next) {
                     renderDelete(res,result0[0].id);          
                 } else{
                     //没有下一行就显示数据库中第一行
-                    mysql(note_sql.select('*','user_id',' limit 1'),[user_id],function (err,result1) {
+                    mysql.find(note_sql.select('*','user_id',' limit 1'),[user_id],function (err,result1) {
                         //判断第一行是否是要删除的那行
                         if (result1[0].id==id) {
-                            mysql(note_sql.delete('id'),[id],function (err,result) {
+                            mysql.delete(note_sql.delete('id'),[id],function (err,result) {
                                 renderDelete(res,'');  
                             })          
                         } else{
@@ -442,7 +469,7 @@ exports.delete=function (req,res,next) {
                 }
             })           
         } else if(follow=='false'){
-            mysql(note_sql.delete('id'),[id],function (err,result) {
+            mysql.delete(note_sql.delete('id'),[id],function (err,result) {
                 if (err) {
                     res.send('-3');
                     return;         
@@ -457,7 +484,7 @@ exports.delete=function (req,res,next) {
             state: '1',
             id: new_id 
         });
-        mysql(note_sql.delete('id'),[req.params['id']],function (err,result) {}) 
+        mysql.delete(note_sql.delete('id'),[req.params['id']],function (err,result) {}) 
     }   
 }
 //获取图片验证码
@@ -480,18 +507,18 @@ exports.teleCode=function (req,res,next) {
         var message=createParam();
         //更新数据库
         function update_sql() {
-            mysql(user_sql.select('telephone'),[telephone],function (err0,result0) {
+            mysql.find(user_sql.select('telephone'),[telephone],function (err0,result0) {
                 if(err0) return;
                 //首页短信登录，为不登录状态。更换手机号时初次验证旧手机号，为登录状态。
                 if (result0.length!==0) {
-                    mysql(user_sql.update('message','telephone'),[message,telephone],function (err1,result1) {
+                    mysql.update(user_sql.update('message','telephone'),[message,telephone],function (err1,result1) {
                         if (err1) return; 
                         res.send('1');//发送成功 
                     })
                 } 
                 //绑定手机号和更换手机号时第二次验证新手机，两种情况下都为登录状态
                 else if(result0.length==0&&req.session.login=='1'){
-                    mysql(user_sql.update('message','id'),[message,req.session.user_id],function (err1,result1) {
+                    mysql.update(user_sql.update('message','id'),[message,req.session.user_id],function (err1,result1) {
                         if (err1) return; 
                         res.send('1');//发送成功 
                     })
@@ -502,10 +529,8 @@ exports.teleCode=function (req,res,next) {
                 }                            
             })  
         }
-        console.log(message);
-        update_sql();
         //发送短信
-        // smsClient(telephone,message,update_sql);
+        smsClient(telephone,message,update_sql);
     })
     
 }
