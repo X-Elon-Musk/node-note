@@ -9,7 +9,7 @@ const SMSClient = require('@alicloud/sms-sdk')
 const accessKeyId = 'LTAINkfU7xNmo0qb'
 const secretAccessKey = 'WNce8J1x0TQFkb57jYOnXW2xyM8pD7'
 
-
+console.log('111111111');
 //操作用户数据库
 var User_sql=function () {};
 User_sql.prototype={
@@ -68,6 +68,7 @@ exports.index=function (req,res,next) {
 }
 //登录
 exports.login=function (req,res,next) {
+    console.log(2222222222);
     var form=new formidable.IncomingForm();
     form.parse(req,function (err,fields,files) {
         //判断是短信登录还是密码登录
