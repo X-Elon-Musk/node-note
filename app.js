@@ -63,7 +63,7 @@ app.post('/teleCode',router.teleCode);
 
 
 
-app.listen(3100);
+app.listen(3389);
 app.listen(app.get('port'), function () {
     console.log('node-note');
 });
