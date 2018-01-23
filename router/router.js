@@ -98,6 +98,7 @@ exports.login=function (req,res,next) {
             var username=fields.username;
             var password=fields.password;
             var password_md5=md5(md5(password)+'792884274');
+            console.log(username);
             mysql(user_sql.select('username'),[username],function (err,result) {
                 if (err) {
                     res.send('-3');//服务器错误
