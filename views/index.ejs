@@ -199,11 +199,14 @@
         },
         //密码登录
         submitPassword: function () {
+            console.log('用户名，密码',$('#username').val(),$('#password').val());
             $.post('/login',{
                 'mode': 'password',
                 'username': $('#username').val(),
                 'password': $('#password').val()
             },function (result) {
+                console.log('用户名，密码',$('#username').val(),$('#password').val());
+                console.log('结果',result);
                 if (result=='1') {
                     window.location='/notePages';
                 } else if(result=='-1'){
