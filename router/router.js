@@ -493,7 +493,7 @@ exports.teleCode=function (req,res,next) {
                 }                            
             })  
         }
-        console.log(message);
+        console.log('短信：',message);
         update_sql();
         //发送短信
         // smsClient(telephone,message,update_sql);
