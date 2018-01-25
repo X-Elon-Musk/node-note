@@ -9,7 +9,6 @@ const SMSClient = require('@alicloud/sms-sdk')
 const accessKeyId = 'LTAINkfU7xNmo0qb'
 const secretAccessKey = 'WNce8J1x0TQFkb57jYOnXW2xyM8pD7'
 
-console.log('111111111');
 //操作用户数据库
 var User_sql=function () {};
 User_sql.prototype={
@@ -68,7 +67,6 @@ exports.index=function (req,res,next) {
 }
 //登录
 exports.login=function (req,res,next) {
-    console.log(2222222222);
     var form=new formidable.IncomingForm();
     form.parse(req,function (err,fields,files) {
         //判断是短信登录还是密码登录
@@ -99,7 +97,6 @@ exports.login=function (req,res,next) {
             var username=fields.username;
             var password=fields.password;
             var password_md5=md5(md5(password)+'792884274');
-            console.log('用户名是多少',username);
             mysql(user_sql.select('username'),[username],function (err,result) {
                 if (err) {
                     res.send('-3');//服务器错误
@@ -275,14 +272,8 @@ exports.bindTelephone=function (req,res,next) {
         var telephone=fields.telephone;
         var message=fields.message;
         var state=fields.state;
-        // console.log(telephone);
-        // console.log('验证码：',message,req.session,req.sessionID);
         mysql(user_sql.select('telephone'),[telephone],function (err,result) {
             if (err) return;
-            /*if (result.length!=0&&req.session.telephone) {
-                res.send('-1');//手机号已被注册
-            } else if(result.length==0){*/
-            // console.log('telephone:',req.session.telephone);
             if(result.length==0&&state=='bind'||result.length!=0&&user_id==result[0].id&&state==''){
                 //已绑定手机号，换绑手机。第一步验证当前手机号，无需再存数据库
                 if (state=='') {
@@ -307,7 +298,6 @@ exports.bindTelephone=function (req,res,next) {
                 })
                 return;
             }
-            console.log('未注册');
             res.send('-1');//手机号已被注册 
         })        
     })
@@ -470,7 +460,6 @@ exports.captcha=function (req,res,next) {
         background: '#d0f3e3'
     });
     req.session.captcha=captcha.text;
-    // console.log(captcha.text);
     res.type('html')
     res.status(200).send(captcha.data);
 }
