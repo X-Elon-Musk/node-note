@@ -99,8 +99,9 @@ exports.login=function (req,res,next) {
             var password_md5=md5(md5(password)+'792884274');
             console.log(username);
             mysql(user_sql.select('username'),[username],function (err,result) {
-                console.log('结果是，',result);
+                // console.log('结果是，',result);
                 if (err) {
+                    console.log(err,result);
                     res.send('-3');//服务器错误
                     return;                   
                 }   
