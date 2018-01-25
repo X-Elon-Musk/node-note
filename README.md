@@ -28,6 +28,33 @@ node app.js
 备忘录编辑
 发布备忘录
 
+### 项目优化
+1. nginx 设置缓存
+受限于购买的阿里云服务器CPU:1核、内存:1GB(I/O优化)、带宽:1Mbps的配置，node.js(http://39.104.65.227:3389/)的加载速度为2.44s，Nginx(http://792884274.com/)的加载速度为6.39s。
+在 nginx.config中设置Nginx缓存，设置缓存后加载速度为2.72s。
+```
+http {
+    ＃缓存目录 目录级别 缓存池 有效时间 最大空间
+    proxy_cache_path  /usr/local/nginx/cache  levels=1:2    keys_zone=STATIC:10m
+    inactive=24h  max_size=1g;
+
+    server
+  {
+    listen       80;
+    server_name 792884274.com www.792884274.com;
+    location / {
+        proxy_set_header    Connection          "";＃header
+        proxy_cache_methods GET HEAD POST;# 缓存方法
+        proxy_ignore_headers Cache-Control Set-Cookie;＃设置客户端缓存
+        proxy_cache            STATIC;＃缓存池
+        proxy_cache_valid      200 20m;＃请求为200 缓存20分钟
+        proxy_cache_use_stale  error timeout invalid_header updating
+                                   http_500 http_502 http_503 http_504;
+        proxy_pass http://39.104.65.227:3389;＃代理地址
+    }
+}
+```
+
 ### 项目布局
 ```
 .
@@ -67,7 +94,6 @@ node app.js
 .
 
 ```
-
 
 
 
