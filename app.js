@@ -13,10 +13,11 @@ app.use(session({
 //设置模板引擎
 app.set("view engine", "ejs");
 
-//静态
+//静态。(设置Response Headers请求头的Cache-Control为max-age=7200)
 app.use(express.static("./public",{
-   maxage: '2h'
+   maxage: '30d'
 }));
+// app.use(express.static("./public"));
 
 
 
