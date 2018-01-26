@@ -14,7 +14,9 @@ app.use(session({
 app.set("view engine", "ejs");
 
 //静态
-app.use(express.static("./public"));
+app.use(express.static("./public",{
+   maxage: '2h'
+}));
 
 
 

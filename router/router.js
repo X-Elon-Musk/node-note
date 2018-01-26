@@ -1,6 +1,6 @@
 var formidable=require('formidable');
-var path=require('path');
-var fs=require('fs');
+/*var path=require('path');
+var fs=require('fs');*/
 var mysql=require('../model/sql-config.js').mysql;
 var md5=require('../model/md5.js');
 var svgCaptcha = require('svg-captcha');
