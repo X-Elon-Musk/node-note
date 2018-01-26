@@ -13,6 +13,18 @@ npm install
 
 node app.js
 ```
+nginx反向代理部署nodejs后，在Xshell中开启node服务
+```
+关闭应用
+[root@izhp37e37j73ghn6yfwf7qz node-note]# sudo forever stop 0
+
+检视运行中的应用
+[root@izhp37e37j73ghn6yfwf7qz node-note]# sudo forever list
+
+开启应用
+[root@izhp37e37j73ghn6yfwf7qz node-note]# sudo forever start app.js
+
+```
 
 ### 项目完成功能
 用户注册
