@@ -85,6 +85,9 @@ http {
     }
 }
 ```
+
+![README](./public/images/README/0.png)
+
 2. node express设置
 express.static可以托管静态文件，express.static(root, [options])在options中设置静态文件的maxage时间。控制台为200 OK (from cache)  是浏览器没有跟服务器确认，直接用了浏览器缓存，所用时间为0ms。
 ```
@@ -92,6 +95,9 @@ app.use(express.static("./public",{
    maxage: '30d'
 }));
 ```
+
+![README](./public/images/README/1.png)
+![README](./public/images/README/2.png)
 
 ### 项目布局
 ```
