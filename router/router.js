@@ -497,9 +497,9 @@ exports.teleCode=function (req,res,next) {
             })  
         }
         console.log('短信：',message);
-        update_sql();
+        // update_sql();
         //发送短信
-        // smsClient(telephone,message,update_sql);
+        smsClient(telephone,message,update_sql);
     })
     
 }
