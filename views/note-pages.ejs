@@ -83,7 +83,6 @@
         },
         //获取所有数据
         get_all: function () {
-            // console.log(11111111);
             $.ajax({
                 'url': '/noteNotes',
                 'type': 'get',
@@ -151,7 +150,6 @@
         zepto_swipeLeft: function (element) {
             var _this=this;
             $(element).swipeLeft(function () {
-                console.log('左滑');  
                 _this.all_back(element);
                 _this.move_active($(this));  
             })
