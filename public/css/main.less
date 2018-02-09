@@ -284,14 +284,14 @@
         }
     }
 }
-//首页、搜索页面公共样式
+//备忘录列表、搜索页面公共样式
 .note-notes{
     padding-bottom: 2em;
     .header{
         .user-info{
             padding: 0 0.4em;
         }
-        .edit-items{
+        .edit-cancel{
             padding: 0 0.4em;
         }
     }
@@ -352,21 +352,40 @@
                 }
             }
         }
-        .item-delete{
-            line-height: 2.8em;
-            height: 100%;
-            // width: 30px;
-            width: 0;
-            overflow: hidden;
-            background: #f66;
-            color: #fff;
-            text-align: center;
-            height: 46px;
-            width: 46px;
-            right: -46px;
-            position: absolute;
-            top: 4px;
-        }
+    }
+}
+//备忘录列表页
+.note-pages{
+    .item-selected{
+        line-height: 2.8em;
+        height: 100%;
+        // width: 30px;
+        width: 0;
+        overflow: hidden;
+        // background: #f66;
+        color: rgba(52, 73, 94, 0.6);
+        font-weight: 200;
+        text-align: center;
+        height: 46px;
+        width: 46px;
+        left: -46px;
+        position: absolute;
+        top: 4px;
+    }
+    .item-delete{
+        line-height: 2.8em;
+        height: 100%;
+        // width: 30px;
+        width: 0;
+        overflow: hidden;
+        background: #f66;
+        color: #fff;
+        text-align: center;
+        height: 46px;
+        width: 46px;
+        right: -46px;
+        position: absolute;
+        top: 4px;
     }
 }
 .note-info{
