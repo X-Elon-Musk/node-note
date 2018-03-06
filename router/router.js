@@ -500,10 +500,14 @@ exports.teleCode=function (req,res,next) {
         // update_sql();
         //发送短信
         smsClient(telephone,message,update_sql);
-    })
-    
+    })  
 }
-    
+//第三方登录
+//QQ第三方登录
+exports.sign=function (req,res,next) {
+    res.render('sign',{})
+}
+        
 
 
 //获取当前时间

@@ -63,6 +63,9 @@ app.post('/delete/:id?',router.delete);
 app.get('/captcha',router.captcha);
 //获取手机验证码
 app.post('/teleCode',router.teleCode);
+//第三方登录
+//QQ第三方登录
+app.get('/sigin',router.sign);
 
 
 

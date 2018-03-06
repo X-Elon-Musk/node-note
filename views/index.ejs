@@ -12,7 +12,7 @@
     <link rel="stylesheet/less" href="/css/main.less"/>
     <link rel="stylesheet" href="/font-awesome/css/font-awesome.min.css">
     <script src="/js/less.js" type="text/javascript" charset="utf-8"></script>
-    <script type="text/javascript" src="http://qzonestyle.gtimg.cn/qzone/openapi/qc_loader.js" data-appid="101466026" data-redirecturi="http://792884274.com/sign" charset="utf-8"></script>
+    <script type="text/javascript" src="http://qzonestyle.gtimg.cn/qzone/openapi/qc_loader.js" data-appid="101466046" data-redirecturi="http://localhost:3389/sigin" charset="utf-8"></script>
 </head>
 <body>
 <div class="vs home login login-register">
@@ -62,7 +62,25 @@
 <script type="text/javascript">
     QC.Login({
        btnId:"qqLoginBtn"    //插入按钮的节点id
-});
+    });
+    QC.api("get_user_info", {}) //get_user_info是API参数
+        //指定接口访问成功的接收函数，s为成功返回Response对象
+        .success(function (response) {
+           //成功回调，通过s.data获取OpenAPI的返回数据
+           nick=response.data.nickname; //获得昵称
+           headurl=response.data.figureurl_qq_1; //获得头像
+           if (QC.Login.check()) {//判断是否登录
+               QC.Login.getMe(function (openId, accessToken) { //这里可以得到openId和accessToken
+                    console.log(response.data,response.data,openId, accessToken);
+                    // document.write(response.data,openId, accessToken);
+               });
+           }
+        })
+        //指定接口访问失败的接收函数，f为失败返回Response对象
+        .error(function (f) {
+           //失败回调
+           alert("获取用户信息失败！");
+       });
 </script>
 <script src="/js/jquery-1.11.3.min.js"></script>
 <script type="text/javascript">
