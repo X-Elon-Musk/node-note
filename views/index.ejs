@@ -59,6 +59,7 @@
     </div>
 </div>
 <span id="qqLoginBtn"></span>
+<script src="/js/jquery-1.11.3.min.js"></script>
 <script type="text/javascript">
     QC.Login({
        btnId:"qqLoginBtn"    //插入按钮的节点id
@@ -71,8 +72,16 @@
            headurl=response.data.figureurl_qq_1; //获得头像
            if (QC.Login.check()) {//判断是否登录
                QC.Login.getMe(function (openId, accessToken) { //这里可以得到openId和accessToken
-                    console.log(response.data,response.data,openId, accessToken);
+                    console.log(headurl,response.data,response.data,openId, accessToken);
                     // document.write(response.data,openId, accessToken);
+                    $.post('/teleCode',{
+                        'telephone': _this.telephone
+                    },function (result) {
+                        if (result=='-1') {
+                            _this.promptDom('手机号码未注册');
+                        }
+                        return;
+                    })
                });
            }
         })
@@ -82,7 +91,6 @@
            alert("获取用户信息失败！");
        });
 </script>
-<script src="/js/jquery-1.11.3.min.js"></script>
 <script type="text/javascript">
     //获取验证码
     function SignIn() {
