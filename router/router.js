@@ -16,8 +16,12 @@ User_sql.prototype={
     init: function () {
         
     },
-    insert: function (username,password) {
-        return 'insert into users('+username+','+password+') values(?,?)';
+    insert: function (username,password,qq_wechat) {
+        if (qq_wechat) {
+            return 'insert into users(username,'+qq_wechat+'_openId,'+qq_wechat+'_accessToken,'+qq_wechat+'_figureurl) values(?,?,?,?)';                                
+        } else{
+            return 'insert into users('+username+','+password+') values(?,?)';
+        }
     },
     select: function (condition,column) {
         if (!column) column='*';
@@ -97,11 +101,10 @@ exports.login=function (req,res,next) {
             var username=fields.username;
             var password=fields.password;
             var password_md5=md5(md5(password)+'792884274');
-            console.log(username);
+            // console.log(username);
             mysql(user_sql.select('username'),[username],function (err,result) {
-                // console.log('结果是，',result);
                 if (err) {
-                    console.log(err,result);
+                    // console.log(err,result);
                     res.send('-3');//服务器错误
                     return;                   
                 }   
@@ -119,6 +122,34 @@ exports.login=function (req,res,next) {
                     return;
                 }
             })  
+        } else if(mode=='qq'){
+            var qq={
+                qq_openId: fields.qq_openId,
+                qq_accessToken: fields.qq_accessToken,
+                qq_nickname: fields.qq_nickname,
+                qq_figureurl: fields.qq_figureurl
+            }
+            mysql(user_sql.select('qq_openId'),[qq.qq_openId],function (err,result) {
+                if (err) {
+                    res.send('-3');//服务器错误
+                    return;                   
+                }   
+                if (result.length==0) {
+                    mysql(user_sql.insert('','',mode),[qq.qq_nickname,qq.qq_openId,qq.qq_accessToken,qq.qq_figureurl],function (result) {
+                        if (err) {
+                            res.send('-3');
+                            return;         
+                        }
+                        req.session.username=qq.qq_nickname;
+                        req.session.login='1';
+                        res.send('1');
+                    })
+                } else{
+                    req.session.username=result[0].username;
+                    req.session.login='1';
+                    res.send('1');
+                }
+            })            
         }
     })
 }
