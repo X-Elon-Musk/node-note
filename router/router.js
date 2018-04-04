@@ -135,17 +135,23 @@ exports.login=function (req,res,next) {
                     return;                   
                 }   
                 if (result.length==0) {
-                    mysql(user_sql.insert('','',mode),[qq.qq_nickname,qq.qq_openId,qq.qq_accessToken,qq.qq_figureurl],function (result) {
+                    mysql(user_sql.insert('','',mode),[qq.qq_nickname,qq.qq_openId,qq.qq_accessToken,qq.qq_figureurl],function (result1) {
+                        console.log('结果是什么'+result);
                         if (err) {
                             res.send('-3');
                             return;         
                         }
+                        /*获取用户的id，在备忘录页面通过id查到该用户所有的备忘录*/
+                        mysql(user_sql.select('username'),[qq.qq_nickname],function (result2) {
+                            req.session.user_id=result2[0].id;
+                        })
                         req.session.username=qq.qq_nickname;
                         req.session.login='1';
                         res.send('1');
                     })
                 } else{
                     req.session.username=result[0].username;
+                    req.session.user_id=result[0].id;
                     req.session.login='1';
                     res.send('1');
                 }
