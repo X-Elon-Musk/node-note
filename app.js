@@ -65,7 +65,9 @@ app.get('/captcha',router.captcha);
 app.post('/teleCode',router.teleCode);
 //第三方登录
 //QQ第三方登录
-app.get('/sigin',router.sign);
+app.get('/sign',router.sign);
+//退出登录
+app.get('/signOut',router.signOut);
 
 
 

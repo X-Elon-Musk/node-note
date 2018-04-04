@@ -136,21 +136,23 @@ exports.login=function (req,res,next) {
                 }   
                 if (result.length==0) {
                     mysql(user_sql.insert('','',mode),[qq.qq_nickname,qq.qq_openId,qq.qq_accessToken,qq.qq_figureurl],function (result1) {
-                        console.log('结果是什么'+result);
+                        // console.log('结果是什么'+result);
                         if (err) {
                             res.send('-3');
                             return;         
                         }
                         /*获取用户的id，在备忘录页面通过id查到该用户所有的备忘录*/
-                        mysql(user_sql.select('username'),[qq.qq_nickname],function (result2) {
+                        mysql(user_sql.select('qq_openId'),[qq.qq_openId],function (result2) {
+                            req.session.username=result2[0].id;
                             req.session.user_id=result2[0].id;
                         })
-                        req.session.username=qq.qq_nickname;
+                        req.session.avatar=qq.qq_figureurl;
                         req.session.login='1';
                         res.send('1');
                     })
                 } else{
                     req.session.username=result[0].username;
+                    req.session.avatar=qq.qq_figureurl;
                     req.session.user_id=result[0].id;
                     req.session.login='1';
                     res.send('1');
@@ -203,7 +205,8 @@ exports.notePages=function (req,res,next) {
     res.render('note-pages',{
         'active': 'pages',
         'login': req.session.login,
-        'username': req.session.username
+        'username': req.session.username,
+        'avatar': req.session.avatar
     })
 }
 //获取个人所有备忘录文本
@@ -544,7 +547,15 @@ exports.teleCode=function (req,res,next) {
 exports.sign=function (req,res,next) {
     res.render('sign',{})
 }
-        
+//退出登录
+exports.signOut=function (req,res,next) {
+    delete req.session.username;
+    delete req.session.user_id;
+    delete req.session.avatar;
+    req.session.login='0';
+    res.redirect('/');
+}
+
 
 
 //获取当前时间

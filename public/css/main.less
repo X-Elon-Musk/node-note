@@ -8,12 +8,14 @@
     top: 0;
     z-index: 100;
     width: 100%;
-    height: 2em;
+    // height: 2em;
+    height: 40px;
     background-color: #fff;
     padding-left: 15px;
     padding-right: 15px;
     box-sizing: border-box; 
-    line-height: 2em;
+    // line-height: 2em;
+    line-height: 40px;
     color: #42b983;
     -webkit-box-shadow: 0 0 8px 0 rgba(66, 185, 131, 0.2);
     box-shadow: 0 0 8px 0 rgba(66, 185, 131, 0.2);
@@ -24,7 +26,8 @@
         padding: 0 0.4em;
         i{
             font-size: 1em;
-            line-height: 2em;
+            // line-height: 2em;
+            line-height: 40px;
             vertical-align: top; 
         }
     }
@@ -38,19 +41,22 @@
     bottom: 0;
     z-index: 100;
     width: 100%;
-    height: 2em;
+    // height: 2em;
+    height: 40px;
     background-color: #fff;
     padding-left: 15px;
     padding-right: 15px;
     box-sizing: border-box; 
-    line-height: 2em;
+    // line-height: 2em;
+    line-height: 40px;
     color: #42b983;
     text-align: center;
     -webkit-box-shadow: 0 0 8px 0 rgba(66, 185, 131, 0.2);
     box-shadow: 0 0 8px 0 rgba(66, 185, 131, 0.2);
     i{
-        font-size: 1em;
-        line-height: 2em;
+        font-size: 1.2em;
+        // line-height: 2em;
+        line-height: 40px;
         vertical-align: middle; 
         padding: 0 0.4em;
     }
@@ -62,7 +68,7 @@
     }
     .notes-number{
         .text-color(1);
-        font-size: 0.6em;
+        font-size: 0.8em;
     }
 }
 .title{
@@ -286,10 +292,19 @@
 }
 //备忘录列表、搜索页面公共样式
 .note-notes{
-    padding-bottom: 2em;
+    // padding-bottom: 2em;
+    padding-top: 40px;
     .header{
+        line-height: 40px;
         .user-info{
             padding: 0 0.4em;
+            .avatar{
+                display: inline-block;
+                height: 28px;
+                padding-top: 6px;
+                box-sizing: content-box;
+                vertical-align: top;
+            }
         }
         .edit-cancel{
             padding: 0 0.4em;
@@ -443,6 +458,15 @@
             .item-content{
                 height: 100%;
                 line-height: 3em;
+            }
+        }
+        .item-signout{
+            padding-top: 1em;
+            box-sizing: content-box;
+            border-bottom: none;
+            a{
+                text-align: center;
+                color: #f66;
             }
         }
     }
