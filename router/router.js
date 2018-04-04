@@ -553,7 +553,8 @@ exports.signOut=function (req,res,next) {
     delete req.session.user_id;
     delete req.session.avatar;
     req.session.login='0';
-    res.redirect('/');
+    // res.redirect('/');
+    res.send('1');
 }
 
 

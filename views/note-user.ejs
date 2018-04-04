@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="/font-awesome/css/font-awesome.min.css">
     <script src="/js/less.js" type="text/javascript" charset="utf-8"></script>
     <script src="/js/jquery-1.11.3.min.js"></script>
+    <script type="text/javascript" src="http://qzonestyle.gtimg.cn/qzone/openapi/qc_loader.js" charset="utf-8"></script>
 </head>
 <body>
 
@@ -72,7 +73,10 @@
         </div>
         <!-- 退出登录 -->
         <div class="info-item clearfix item-signout">
-            <a href="/signOut" class="clearfix">
+            <!-- <a href="/signOut" class="clearfix">
+                退出登录
+            </a> -->
+            <a href="javascript:;" class="clearfix item-signout-button" >
                 退出登录
             </a>
         </div>
@@ -80,7 +84,14 @@
 </div>
 
 <script type="text/javascript">
-     
+    $('.item-signout-button').click(function () {
+        $.get('/signOut',function(result){
+            if (result=='1') {
+                QC.Login.signOut();
+                window.location='/';  
+            }
+        })
+    })
 </script>
 </body>
 </html>
