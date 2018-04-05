@@ -171,18 +171,28 @@ body {
     margin-top: 15px;
     width: 100%;
     color: #fff!important;
-    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #6cdaa8), to(#42b983));
-    background-image: linear-gradient(to bottom, #6cdaa8 0, #42b983 100%);
+    // background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #6cdaa8), to(#42b983));
+    // background-image: linear-gradient(to bottom, #6cdaa8 0, #42b983 100%);
     filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff6cdaa8', endColorstr='#ff42b983', GradientType=0);
     filter: progid:DXImageTransform.Microsoft.gradient(enabled=false);
     background-repeat: repeat-x;
     border-color: #42b983!important;
+    background: #42b983;
     text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.2);
-    -webkit-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 1px 1px rgba(0, 0, 0, 0.075);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 1px 1px rgba(0, 0, 0, 0.075);
+    font-size: 100%;
+    // -webkit-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 1px 1px rgba(0, 0, 0, 0.075);
+    // box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 1px 1px rgba(0, 0, 0, 0.075);
 }
 .form-control{
     padding: 6px 1em;
+    border-bottom: 1px solid #ececec;
+    border-left: transparent;
+    border-top: transparent;
+    border-right: transparent;
+    border-radius: 0;
+    box-shadow: none;
+    -wekbit-box-shadow: none;
+
 }
 .form-control:focus {
     border-color: #42b983;

@@ -54,10 +54,11 @@
         <div class="prompt" role="alert">错误</div>
         <button type="button" class="btn btn-customized" id="submit">登录</button>
         <div class="register">
-            <a href="/noteRegister">没有账号，去注册</a>
+            <a href="/noteRegister">注册</a>
         </div>
     </div>
 </div>
+<!-- 第三方登录 -->
 <span id="qqLoginBtn"></span>
 <script src="/js/jquery-1.11.3.min.js"></script>
 <script type="text/javascript">
@@ -67,14 +68,10 @@
     QC.api("get_user_info", {}) //get_user_info是API参数
         //指定接口访问成功的接收函数，s为成功返回Response对象
         .success(function (response) {
-           //成功回调，通过s.data获取OpenAPI的返回数据
-           nick=response.data.nickname; //获得昵称
-           headurl=response.data.figureurl_qq_1; //获得头像
+           //成功回调，通过response.data获取OpenAPI的返回数据
            if (QC.Login.check()) {//判断是否登录
                QC.Login.getMe(function (openId, accessToken) { //这里可以得到openId和accessToken
-                    // console.log(headurl,response.data,response.data,openId, accessToken);
-                    console.log(openId, accessToken);
-                    console.log(response.data);
+                    // console.log(openId,accessToken,response.data);
                     $.post('/login',{
                         'mode': 'qq',
                         'qq_openId': openId,
@@ -85,9 +82,7 @@
                         if (result=='1') {
                             window.location='/notePages';
                         } else if(result=='-1'){
-                            // _this.promptDom('手机号未绑定');
                         } else if(result=='-2'){
-                            // _this.promptDom('验证码不正确');
                         }
                     })
                });
