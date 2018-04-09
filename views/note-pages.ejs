@@ -29,7 +29,7 @@
             <img src="<%=avatar%>" alt="" class="avatar">
             <%=username%>
         </a>
-        <strong class="f_r edit-cancel edit-active" id="edit-cancel">编辑</strong>
+        <strong class="f_r edit-cancel edit-active" id="edit-cancel" style="display: none;">编辑</strong>
     </header>
     <div class="content">
         <h1 class="title">备忘录</h1>
@@ -231,7 +231,7 @@
         }
     }
     var delete_note=new Delete_note();
-    //批量删除
+   /* //批量删除
     var Delete_notes=function () {
         this.init();
     };
@@ -259,7 +259,7 @@
         },
           
     }
-    var delete_notes=new Delete_notes();
+    var delete_notes=new Delete_notes();*/
     //备忘录操作
     //自定义‘zepto’、删除单条备忘录事件
     ko.bindingHandlers.zepto={
