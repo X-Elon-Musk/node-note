@@ -141,7 +141,7 @@ exports.login=function (req,res,next) {
                             res.send('-3');
                             return;         
                         }
-                        /*获取用户的id，在备忘录页面通过id查到该用户所有的备忘录*/
+                        //获取用户的id，在备忘录页面通过id查到该用户所有的备忘录
                         mysql(user_sql.select('qq_openId'),[qq.qq_openId],function (result2) {
                             req.session.username=result2[0].id;
                             req.session.user_id=result2[0].id;

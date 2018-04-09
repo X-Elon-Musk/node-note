@@ -26,7 +26,11 @@
     <header class="clearfix header">
         <a href="/noteUser" class="user-info">
             <!-- <i class="fa fa-user fa-lg"></i> -->
-            <img src="<%=avatar%>" alt="" class="avatar">
+            <% if(!avatar){ %>
+                <img src="/images/default_avatar.png" alt="" class="avatar">
+            <% } else{%>
+                <img src="<%=avatar%>" alt="" class="avatar">
+            <% }%>
             <%=username%>
         </a>
         <strong class="f_r edit-cancel edit-active" id="edit-cancel" style="display: none;">编辑</strong>
