@@ -546,6 +546,7 @@ exports.teleCode=function (req,res,next) {
 //QQ第三方登录
 exports.sign=function (req,res,next) {
     res.render('sign',{})
+    // res.redirect('/notePages');
 }
 //退出登录
 exports.signOut=function (req,res,next) {

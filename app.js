@@ -67,8 +67,8 @@ app.post('/teleCode',router.teleCode);
 //QQ第三方登录
 app.get('/sign',router.sign);
 //退出登录
-// app.get('/signOut',router.signOut);
-app.get('/signOut',router.notePages);
+app.get('/signOut',router.signOut);
+// app.get('/signOut',router.notePages);
 
 
 
