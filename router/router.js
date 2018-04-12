@@ -101,10 +101,8 @@ exports.login=function (req,res,next) {
             var username=fields.username;
             var password=fields.password;
             var password_md5=md5(md5(password)+'792884274');
-            // console.log(username);
             mysql(user_sql.select('username'),[username],function (err,result) {
                 if (err) {
-                    // console.log(err,result);
                     res.send('-3');//服务器错误
                     return;                   
                 }   
@@ -212,6 +210,7 @@ exports.notePages=function (req,res,next) {
 //获取个人所有备忘录文本
 exports.noteNotes=function (req,res,next) {
     var user_id=req.session.user_id;
+    console.log(req.params);
     mysql(note_sql.select('*','user_id'),[user_id],function (err,result) {
         if (err) {
             res.send('-2');
@@ -559,6 +558,16 @@ exports.signOut=function (req,res,next) {
 }
 
 
+
+exports.test=function (req,res) {
+    // res.send('测试数据');
+    var obj={
+        'text': '测试数据'
+    };
+    res.type('application/json');
+    res.jsonp(obj);
+}
+    
 
 //获取当前时间
 function getNowFormatDate(date) {

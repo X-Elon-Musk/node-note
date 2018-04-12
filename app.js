@@ -34,7 +34,8 @@ app.post('/register',router.register);
 //显示备忘录
 app.get('/notePages',router.notePages);
 //获取个人所有备忘录文本
-app.get('/noteNotes',router.noteNotes);
+// app.get('/noteNotes',router.noteNotes);
+app.get('/noteNotes/:id?',router.noteNotes);
 //搜索备忘录
 app.post('/search',router.search);
 //获取用户信息页面
@@ -70,7 +71,7 @@ app.get('/sign',router.sign);
 app.get('/signOut',router.signOut);
 // app.get('/signOut',router.notePages);
 
-
+app.get('/test',router.test);
 
 app.listen(3389);
 app.listen(app.get('port'), function () {
