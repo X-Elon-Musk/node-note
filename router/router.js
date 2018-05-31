@@ -9,6 +9,12 @@ const SMSClient = require('@alicloud/sms-sdk')
 const accessKeyId = 'LTAINkfU7xNmo0qb'
 const secretAccessKey = 'WNce8J1x0TQFkb57jYOnXW2xyM8pD7'
 
+
+// avatar写入
+var fs = require('fs');
+var path = 'public/images/avatar'+ Date.now() +'.png';//从app.js级开始找
+
+
 //操作用户数据库
 var User_sql=function () {};
 User_sql.prototype={
@@ -575,7 +581,20 @@ exports.changeAvatar=function (req,res,next) {
     var form=new formidable.IncomingForm();
     form.parse(req,function (err,fields,files) {
         // var telephone=fields.telephone;
-        console.log(fields);
+        // console.log(fields);
+        //去掉图片base64码前面部分data:image/png;base64
+        var base64 = fields.avatar.replace(/^data:image\/\w+;base64,/, "");
+        //把base64码转成buffer对象
+        var dataBuffer = new Buffer(base64, 'base64'); 
+        // console.log('dataBuffer是否是Buffer对象：'+Buffer.isBuffer(dataBuffer));
+        //用fs写入文件
+        fs.writeFile(path,dataBuffer,function(err){
+            if(err){
+                console.log(err);
+            }else{
+               console.log('写入成功！');
+            }
+        })
     })  
 }
 
@@ -642,15 +661,4 @@ function smsClient(telephone,message,calllback) {
         return;
     })
 }    
-
-
-
-
-
-
-
-
-    
-
-
 
