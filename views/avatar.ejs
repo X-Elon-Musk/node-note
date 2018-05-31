@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+    <link rel="icon" href="/images/favicon.ico">
+    <title>node-note</title>
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet/less" href="/css/reset.less"/>
+    <link rel="stylesheet/less" href="/css/main.less"/>
+    <script src="/js/less.js" type="text/javascript" charset="utf-8"></script>
+</head>
+<body>
+<div class="avatar-container">
+    <a class="logo" id="logo">
+        <img id="bgl" src="/images/logo_n.png">
+    </a>
+    <article class="photoClip-container">
+        <div id="clipArea"></div>
+        <div class="clearfix foot-use">
+            <div class="uploader blue">
+                <input type="button" name="file" class="btn btn-customized button" value="打开">
+                <input id="file" type="file" onchange="setImagePreview(this)" accept="image/*"/>
+            </div>
+            <button type="button" class="btn btn-customized" id="clipBtn">截取</button>
+        </div>
+        <div id="view"></div>
+    </article>
+    <form action="" method="post" class="avatar-form">
+        <input type="hidden" value="" name="avatar" class="avatar" />
+    </form>
+
+</div>
+
+
+<script src="/js/jquery-1.11.3.min.js"></script>
+<script src="/js/iscroll-zoom.js"></script>
+<script src="/js/hammer.js"></script>
+<script src="/js/jquery.photoClip.js"></script>
+<script src="/js/jquery.form.js"></script>
+<script type="text/javascript">
+    $("#clipArea").photoClip({
+        width: 188,
+        height: 188,
+        file: "#file",
+        view: "#view",
+        ok: "#clipBtn",
+        loadStart: function() {
+            console.log("照片读取中");
+        },
+        loadComplete: function() {
+            console.log("照片读取完成");
+        },
+        clipFinish: function(dataURL) {
+            console.log(dataURL);
+        }
+    });
+    $("#logo").click(function(){
+        $(".photoClip-container").show();
+    })
+    $("#clipBtn").click(function(){
+        $('#logo').html('<img src="' + imgsource + '" align="absmiddle">');
+        $(".photoClip-container").hide();
+        $('.avatar').val(imgsource);
+        console.log('===========');
+        console.log(imgsource);
+        console.log('===========');
+        var options={
+            type: 'post',
+            url: '/changeAvatar',
+            // target: 'http://10.0.8.46/wxconvert/api/user/saveUserPicApply',
+            dataType:'json',
+            success: function (data) {
+                console.log(data);
+            },
+            error: function (error) {
+                console.log('错误');
+                //alert(JSON.stringify(error));
+            },
+            complete: function (data) {
+                // console.log(data);
+            }
+        }
+        $('.avatar-form').ajaxSubmit(options);
+
+        event.preventDefault();
+    })
+
+    function setImagePreview(file) {
+        var input = document.getElementById("file");
+        // var fileSize = 0,
+        // fileMaxSize = 1024*1;//1M  
+        var filePath = file.value;  
+        if(filePath){  
+            //图片信息
+            for(var i=0;i<input.files.length;i++){   
+                //判断上传文件格式   
+                if (!file.files[i]['name'].match(/.jpg|.jpeg|.gif|.png|.bmp/i)){　　
+                    alert("上传的图片格式不正确，请重新选择");
+                    input.value='';
+                    file.value='';
+                    break;　　　　　　　　　
+                }   
+    //             var fileSize=file.files[i]['size']; 
+                // var size=fileSize/1024;  
+          //    if (size>fileMaxSize||size <= 0) {  
+                //  alert("请重新选择文件");  
+          //        file.value[i] = "";  
+          //        return;
+          //    }  
+                var reader = new FileReader();   
+                reader.readAsDataURL(file.files[i]);  
+
+                reader.onload = function(e){     
+                    console.log(this.result);                   
+                }   
+            } 
+        }else{  
+            return false;  
+        }  
+    }
+</script>
+</body>
+</html>

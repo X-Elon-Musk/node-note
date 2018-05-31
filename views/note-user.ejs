@@ -38,6 +38,17 @@
                     <i class="fa fa-angle-right fa-lg"></i>
                 </strong>
             </a>
+            <a href="/avatar" class="clearfix">
+                <span class="item-name f_l">头像</span>
+                <strong class="clearfix item-content f_r">
+                    <% if(!avatar){ %>
+                        <img src="/images/default_avatar.png" alt="" class="avatar">
+                    <% } else{%>
+                        <img src="<%=avatar%>" alt="" class="avatar">
+                    <% }%>
+                    <i class="fa fa-angle-right fa-lg avatar-lg"></i>
+                </strong>
+            </a>
         </div>
         <!-- 账号绑定 -->
         <p class="item-classify">

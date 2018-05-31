@@ -53,6 +53,7 @@
                             <span data-bind="text:note_show.note_analyze(text).title"></span>
                         </div>
                         <div class="item-content">
+                            <!-- <img  data-bind="attr:{src:image}" alt="" class="avatar" style="height: 1.5em;width: auto;"> -->
                             <span data-bind="text:note_show.time_change(time)" class="item-time"></span>
                             <span data-bind="text:note_show.note_analyze(text).content" class="item-text"></span>
                         </div>
@@ -112,6 +113,7 @@
                             // ko.applyBindings(notes_list,document.getElementById("notes-items"));             
                             ko.applyBindings(notes_list);             
                         }
+                        console.log(result.text);
                         notes_list.notes(result.text);
                     } else{
                         alert('错误！'); 

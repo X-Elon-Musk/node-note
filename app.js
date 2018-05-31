@@ -20,6 +20,12 @@ app.use(express.static("./public",{
 // app.use(express.static("./public"));
 
 
+app.get('/public/images/*', function (req, res) {
+	console.log('req.url: '+req.url);
+    res.sendFile( __dirname + "/" + req.url );
+    console.log("Request for " + req.url + " received.");
+})
+
 
 
 
@@ -70,10 +76,23 @@ app.get('/sign',router.sign);
 //退出登录
 app.get('/signOut',router.signOut);
 // app.get('/signOut',router.notePages);
+//更改头像页面
+app.get('/avatar',router.avatar);
+//更改头像
+app.post('/changeAvatar',router.changeAvatar);
+
+
 
 app.get('/test',router.test);
 
-app.listen(3389);
+/*app.listen(3389);
 app.listen(app.get('port'), function () {
     console.log('node-note');
-});
+});*/
+
+let server = app.listen(3389, 'localhost', function () {
+    console.log("地址信息:",server.address());
+    const host = server.address().address;
+    const port = server.address().port;
+    console.log("======启动服务http://%s:%s======", host, port);
+})

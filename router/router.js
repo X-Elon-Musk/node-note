@@ -102,6 +102,7 @@ exports.login=function (req,res,next) {
             var password=fields.password;
             var password_md5=md5(md5(password)+'792884274');
             mysql(user_sql.select('username'),[username],function (err,result) {
+                // console.log(result);
                 if (err) {
                     res.send('-3');//服务器错误
                     return;                   
@@ -113,6 +114,7 @@ exports.login=function (req,res,next) {
                 if (password_md5==result[0].password) {
                     req.session.username=username;
                     req.session.user_id=result[0].id;
+                    result[0].qq_figureurl?req.session.avatar='http://localhost:3389/public/images/'+result[0].qq_figureurl:req.session.avatar='';
                     req.session.login='1';
                     res.send('1');//登录成功，写入session
                 } else{
@@ -210,12 +212,19 @@ exports.notePages=function (req,res,next) {
 //获取个人所有备忘录文本
 exports.noteNotes=function (req,res,next) {
     var user_id=req.session.user_id;
-    console.log(req.params);
-    mysql(note_sql.select('*','user_id'),[user_id],function (err,result) {
+    //console.log(req.params);
+    // mysql(note_sql.select('*','user_id'),[user_id],function (err,result) {
+    mysql("select *,CONCAT('http://localhost:3389/public/images/',image) as image from notes where user_id=?",[user_id],function (err,result) {
+        // console.log(result);
         if (err) {
             res.send('-2');
             return;           
         }
+        // result.forEach(function (item,index,array) {
+        //     if (item.image) {
+        //         item.image='http://localhost:3389/public/images/'+item.image;         
+        //     }
+        // })
         var obj={
             'text': result
         };
@@ -256,7 +265,8 @@ exports.noteUser=function (req,res,next) {
         res.render('note-user',{
             'id': result[0].id,
             'username': result[0].username,
-            'telephone': telephone
+            'telephone': telephone,
+            'avatar': req.session.avatar
         })
     })
 }
@@ -556,6 +566,21 @@ exports.signOut=function (req,res,next) {
     // res.redirect('/');
     res.send('1');
 }
+//更改头像页面
+exports.avatar=function (req,res,next) {
+    res.render('avatar',{})
+}
+//更改头像
+exports.changeAvatar=function (req,res,next) {
+    var form=new formidable.IncomingForm();
+    form.parse(req,function (err,fields,files) {
+        // var telephone=fields.telephone;
+        console.log(fields);
+    })  
+}
+
+
+
 
 
 

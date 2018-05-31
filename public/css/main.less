@@ -344,6 +344,13 @@
         }
     }
 }
+.avatar{
+    display: inline-block;
+    height: 28px;
+    padding-top: 6px;
+    box-sizing: content-box;
+    vertical-align: top;
+}
 //备忘录列表、搜索页面公共样式
 .note-notes{
     // padding-bottom: 2em;
@@ -419,9 +426,11 @@
                 font-size: 0.8em;
                 line-height: 1.5em;
                 height: 1.5em;
+                width: auto;
                 white-space: nowrap;
                 text-overflow: ellipsis;
                 overflow: hidden;
+                position: relative;
                 .item-time{
                     color: rgba(52, 73, 94, 0.8);
                 }
@@ -507,20 +516,37 @@
         }
         .info-item{
             width: 100%;
-            height: 3em;
+            height: auto;
             padding: 0;
             line-height: 3em;
             box-sizing: border-box;
             border-bottom: 1px solid rgba(52, 73, 94,0.2);
             a{
-                display: inline-block;
-                height: 100%;
+                display: block;
+                height: 3em;
                 width: 100%;
                 color: #34495e;
+                margin: 0;
+                padding: 0;
             }
             .item-content{
                 height: 100%;
                 line-height: 3em;
+                min-width: 1em;
+                position: relative;
+                .avatar{
+                    position: absolute;
+                    top: 50%;
+                    right: 1em;
+                    transform: translate(0, -50%);
+                    padding: 0;
+                }
+                .avatar-lg{
+                    position: absolute;
+                    top: 50%;
+                    right: 0em;
+                    transform: translate(0, -50%);
+                }
             }
         }
         .item-signout{
@@ -549,4 +575,103 @@
 //搜索页面
 .note-search{
     .note-search-input{}
+}
+//更改头像页面
+.avatar-container{
+    .logo{
+        position: relative;
+        width: 8rem;
+        display: inline-block;
+        background: #42b983;
+        height: 8rem;
+        border-radius: 100%;
+        img{
+            width: 5rem;
+            height: 5rem;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+        }
+    }
+    .photoClip-container{
+        margin: 0 auto;
+        text-align: center;
+        overflow: hidden;
+        width: 100%;
+        height: 100%;
+        position: fixed;
+        top: 0;
+        background: #000;
+        z-index: 100;
+        display: none;
+    }
+    #clipArea {
+        height: 100%;
+    }
+    .foot-use{
+        height: 3em;
+        width: 100%;
+        position: fixed;
+        left: 0;
+        bottom: 1em;
+        z-index: 10;
+        text-align: center;
+    }
+    .uploader {
+        position: relative;
+        height: 100%;
+        width: 5em;
+        cursor: default;
+        display: inline-block;
+        vertical-align: top;
+        input[type=file] {
+            position: absolute;
+            top: 0;
+            left: 0;
+            border: 0;
+            padding: 0;
+            margin: 0;
+            height:100%;
+            width: 100%;
+            cursor: pointer;
+            opacity: 0;
+        }
+    }
+    .blue .button {
+        float: left;
+        height: 100%;
+        width: 100%;
+        background: #42b983;
+        border: 0;
+        outline: none;
+        color: #fff;
+        z-index: 999;
+        margin: 0;
+
+    }
+
+    input[type=button]::-moz-focus-inner {
+        padding: 0;
+        border: 0 none;
+        -moz-box-sizing: content-box;
+    }
+
+    input[type=button]::-webkit-focus-inner {
+        padding: 0;
+        border: 0 none;
+        -webkit-box-sizing: content-box;
+    }
+    #clipBtn{
+        height: 100%;
+        width: 5rem;
+        background: #42b983;
+        border: 0;
+        outline: none;
+        color: #fff;
+        margin: 0;
+        display: inline-block;
+        vertical-align: top;
+        margin-left: 1em;
+    }
 }
