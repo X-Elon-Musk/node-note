@@ -14,10 +14,10 @@
 </head>
 <body>
 <div class="avatar-container">
-    <a class="logo" id="logo">
+    <!-- <a class="logo" id="logo">
         <img id="bgl" src="/images/logo_n.png">
-    </a>
-    <article class="photoClip-container">
+    </a> -->
+    <div class="photoClip-container">
         <div id="clipArea"></div>
         <div class="clearfix foot-use">
             <div class="uploader blue">
@@ -27,7 +27,7 @@
             <button type="button" class="btn btn-customized" id="clipBtn">截取</button>
         </div>
         <div id="view"></div>
-    </article>
+    </div>
     <form action="" method="post" class="avatar-form">
         <input type="hidden" value="" name="avatar" class="avatar" />
     </form>
@@ -57,16 +57,16 @@
             console.log(dataURL);
         }
     });
-    $("#logo").click(function(){
-        $(".photoClip-container").show();
-    })
+    // $("#logo").click(function(){
+    //     $(".photoClip-container").show();
+    // })
     $("#clipBtn").click(function(){
-        $('#logo').html('<img src="' + imgsource + '" align="absmiddle">');
-        $(".photoClip-container").hide();
+        // $('#logo').html('<img src="' + imgsource + '" align="absmiddle">');
+        // $(".photoClip-container").hide();
         $('.avatar').val(imgsource);
-        console.log('===========');
-        console.log(imgsource);
-        console.log('===========');
+        // console.log('===========');
+        // console.log(imgsource);
+        // console.log('===========');
         var options={
             type: 'post',
             url: '/changeAvatar',
@@ -74,6 +74,10 @@
             dataType:'json',
             success: function (data) {
                 console.log(data);
+                if (data=='1') {
+                    window.location='/noteUser';
+                }
+                // window.location="/noteUser";
             },
             error: function (error) {
                 console.log('错误');

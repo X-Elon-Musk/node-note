@@ -1,22 +1,25 @@
-var formidable=require('formidable');
-/*var path=require('path');
-var fs=require('fs');*/
-var mysql=require('../model/sql-config.js').mysql;
-var md5=require('../model/md5.js');
-var svgCaptcha = require('svg-captcha');
+let formidable=require('formidable');
+/*let path=require('path');
+let fs=require('fs');*/
+let mysql=require('../model/sql-config.js').mysql;
+let md5=require('../model/md5.js');
+let svgCaptcha = require('svg-captcha');
 const SMSClient = require('@alicloud/sms-sdk')
 // ACCESS_KEY_ID/ACCESS_KEY_SECRET 根据实际申请的账号信息进行替换
 const accessKeyId = 'LTAINkfU7xNmo0qb'
 const secretAccessKey = 'WNce8J1x0TQFkb57jYOnXW2xyM8pD7'
 
+let dirname='http://localhost:3389/public/images/';
+
 
 // avatar写入
-var fs = require('fs');
-var path = 'public/images/avatar'+ Date.now() +'.png';//从app.js级开始找
+let fs = require('fs');
+let originalPath = 'public/images/';//从app.js级开始找
+// let path = 'public/images/avatar'+ Date.now() +'.png';//从app.js级开始找
 
 
 //操作用户数据库
-var User_sql=function () {};
+let User_sql=function () {};
 User_sql.prototype={
     constructor: User_sql,
     init: function () {
@@ -38,7 +41,7 @@ User_sql.prototype={
     }
 }
 //操作备忘录数据库
-var Note_sql=function () {};
+let Note_sql=function () {};
 Note_sql.prototype={
     constructor: Note_sql,
     init: function () {
@@ -67,8 +70,8 @@ Note_sql.prototype={
         return 'select * from notes where id=(select min(id) from notes where id>? and user_id=?)';
     }
 }
-var user_sql=new User_sql();
-var note_sql=new Note_sql();
+let user_sql=new User_sql();
+let note_sql=new Note_sql();
 
 
 //显示首页
@@ -77,13 +80,13 @@ exports.index=function (req,res,next) {
 }
 //登录
 exports.login=function (req,res,next) {
-    var form=new formidable.IncomingForm();
+    let form=new formidable.IncomingForm();
     form.parse(req,function (err,fields,files) {
         //判断是短信登录还是密码登录
-        var mode=fields.mode;
+        let mode=fields.mode;
         if (mode=='message') {
-            var telephone=fields.telephone;
-            var message=fields.message;
+            let telephone=fields.telephone;
+            let message=fields.message;
             mysql(user_sql.select('telephone'),[telephone],function (err,result) {
                 if (err) {
                     res.send('-3');//服务器错误
@@ -104,9 +107,9 @@ exports.login=function (req,res,next) {
                 }
             })            
         } else if(mode=='password'){
-            var username=fields.username;
-            var password=fields.password;
-            var password_md5=md5(md5(password)+'792884274');
+            let username=fields.username;
+            let password=fields.password;
+            let password_md5=md5(md5(password)+'792884274');
             mysql(user_sql.select('username'),[username],function (err,result) {
                 // console.log(result);
                 if (err) {
@@ -120,7 +123,7 @@ exports.login=function (req,res,next) {
                 if (password_md5==result[0].password) {
                     req.session.username=username;
                     req.session.user_id=result[0].id;
-                    result[0].qq_figureurl?req.session.avatar='http://localhost:3389/public/images/'+result[0].qq_figureurl:req.session.avatar='';
+                    result[0].qq_figureurl?req.session.avatar=dirname+result[0].qq_figureurl:req.session.avatar='';
                     req.session.login='1';
                     res.send('1');//登录成功，写入session
                 } else{
@@ -129,7 +132,7 @@ exports.login=function (req,res,next) {
                 }
             })  
         } else if(mode=='qq'){
-            var qq={
+            let qq={
                 qq_openId: fields.qq_openId,
                 qq_accessToken: fields.qq_accessToken,
                 qq_nickname: fields.qq_nickname,
@@ -173,11 +176,11 @@ exports.noteRegister=function (req,res,next) {
 }
 //注册
 exports.register=function (req,res,next) {
-    var form=new formidable.IncomingForm();
+    let form=new formidable.IncomingForm();
     form.parse(req,function (err,fields,files) {
-        var username=fields.username;
-        var password=fields.password;
-        var captcha=fields.captcha;
+        let username=fields.username;
+        let password=fields.password;
+        let captcha=fields.captcha;
         if (captcha.toLowerCase()!==req.session.captcha.toLowerCase()) {
             res.send('-2');//验证码不对
             return;            
@@ -217,7 +220,7 @@ exports.notePages=function (req,res,next) {
 }
 //获取个人所有备忘录文本
 exports.noteNotes=function (req,res,next) {
-    var user_id=req.session.user_id;
+    let user_id=req.session.user_id;
     //console.log(req.params);
     // mysql(note_sql.select('*','user_id'),[user_id],function (err,result) {
     mysql("select *,CONCAT('http://localhost:3389/public/images/',image) as image from notes where user_id=?",[user_id],function (err,result) {
@@ -231,7 +234,7 @@ exports.noteNotes=function (req,res,next) {
         //         item.image='http://localhost:3389/public/images/'+item.image;         
         //     }
         // })
-        var obj={
+        let obj={
             'text': result
         };
         res.json(obj);
@@ -239,16 +242,16 @@ exports.noteNotes=function (req,res,next) {
 }
 //搜索备忘录
 exports.search=function (req,res,next) {
-    var user_id=req.session.user_id;
-    var form=new formidable.IncomingForm();
+    let user_id=req.session.user_id;
+    let form=new formidable.IncomingForm();
     form.parse(req,function (err,fields,files) {
-        var text=fields.text;  
+        let text=fields.text;  
         mysql(note_sql.select_fuzzy('text'),[text,user_id],function (err,result) {
             if (err) {
                 res.send('-2');
                 return;           
             }
-            var obj={
+            let obj={
                 'text': result
             };
             res.json(obj);
@@ -261,7 +264,7 @@ exports.noteUser=function (req,res,next) {
     if (req.session.login!=='1') {
         return;   
     }
-    var username=req.session.username,
+    let username=req.session.username,
         telephone='';
     mysql(user_sql.select('username'),[username],function (err,result) {
         if (err) {
@@ -282,10 +285,10 @@ exports.noteUsername=function (req,res,next) {
 }
 //修改用户的用户名
 exports.noteChangeUsername=function (req,res,next) {
-    var user_id=req.session.user_id;
-    var form=new formidable.IncomingForm();
+    let user_id=req.session.user_id;
+    let form=new formidable.IncomingForm();
     form.parse(req,function (err,fields,files) {
-        var username=fields.username;
+        let username=fields.username;
         if (username==req.session.username) {
             res.send('2');//修改后的用户名和原用户名相同         
         } else{
@@ -309,7 +312,7 @@ exports.noteChangeUsername=function (req,res,next) {
 }
 //显示修改用户手机号页面
 exports.noteTelephone=function (req,res,next) {
-    var username=req.session.username,
+    let username=req.session.username,
         telephone='';
     mysql(user_sql.select('username'),[username],function (err,result) {
         if (err) {
@@ -324,12 +327,12 @@ exports.noteTelephone=function (req,res,next) {
 }
 //用户绑定手机号
 exports.bindTelephone=function (req,res,next) {
-    var user_id=req.session.user_id;
-    var form=new formidable.IncomingForm();
+    let user_id=req.session.user_id;
+    let form=new formidable.IncomingForm();
     form.parse(req,function (err,fields,files) {
-        var telephone=fields.telephone;
-        var message=fields.message;
-        var state=fields.state;
+        let telephone=fields.telephone;
+        let message=fields.message;
+        let state=fields.state;
         mysql(user_sql.select('telephone'),[telephone],function (err,result) {
             if (err) return;
             if(result.length==0&&state=='bind'||result.length!=0&&user_id==result[0].id&&state==''){
@@ -366,11 +369,11 @@ exports.notePassword=function (req,res,next) {
 }
 //修改用户的密码
 exports.noteChangePassword=function (req,res,next) {
-    var user_id=req.session.user_id;
-    var form=new formidable.IncomingForm();
+    let user_id=req.session.user_id;
+    let form=new formidable.IncomingForm();
     form.parse(req,function (err,fields,files) {
-        var old_password=md5(md5(fields.old_password)+'792884274');
-        var new_password=md5(md5(fields.new_password)+'792884274');
+        let old_password=md5(md5(fields.old_password)+'792884274');
+        let new_password=md5(md5(fields.new_password)+'792884274');
         mysql(user_sql.select('id'),[user_id],function (err0,result0) {
             if (err0) return;
             if (result0[0].password!=old_password) {
@@ -399,7 +402,7 @@ exports.noteSearch=function (req,res,next) {
     
 //显示编辑页面(在无内容和有内容情况下，渲染页面)
 exports.noteEdit=function (req,res,next) {
-    var id=req.params['id'];
+    let id=req.params['id'];
     if (id) {
         mysql(note_sql.select('*','id'),[id],function (err,result) {
             if (result.length!==0) {
@@ -431,14 +434,14 @@ exports.record=function (req,res,next) {
         res.end('请登录。');
         return;
     }*/
-    var id=req.params['id'];
-    var form=new formidable.IncomingForm();
+    let id=req.params['id'];
+    let form=new formidable.IncomingForm();
     form.parse(req, function (err,fields,files) {
         //存入user_id、text、time
-        var data=fields.data;
-        var arr=data.split('&');
-        var time=arr[0].split('=')[1];
-        var text=arr[1].split('=')[1];
+        let data=fields.data;
+        let arr=data.split('&');
+        let time=arr[0].split('=')[1];
+        let text=arr[1].split('=')[1];
         if (id) {
             time=getNowFormatDate(new Date());
             mysql(note_sql.update('id'),[time,text,id],function (err,result) {
@@ -462,11 +465,11 @@ exports.record=function (req,res,next) {
 
 //删除单条备忘记录
 exports.delete=function (req,res,next) {
-    var id=req.params['id'];
-    var form=new formidable.IncomingForm();
-    var user_id=req.session.user_id;
+    let id=req.params['id'];
+    let form=new formidable.IncomingForm();
+    let user_id=req.session.user_id;
     form.parse(req,function (err,fields,files) {
-        var follow=fields.follow;
+        let follow=fields.follow;
         //判断是否有后续操作(是否要显示下一条数据)
         if (follow=='true') {
             mysql(note_sql.delete_select(),[id,user_id],function (err,result0) {
@@ -512,7 +515,7 @@ exports.delete=function (req,res,next) {
 }
 //获取图片验证码
 exports.captcha=function (req,res,next) {
-    var captcha = svgCaptcha.create({
+    let captcha = svgCaptcha.create({
         noise: 3,
         color: false,
         background: '#d0f3e3'
@@ -523,10 +526,10 @@ exports.captcha=function (req,res,next) {
 }
 //获取手机验证码
 exports.teleCode=function (req,res,next) {
-    var form=new formidable.IncomingForm();
+    let form=new formidable.IncomingForm();
     form.parse(req,function (err,fields,files) {
-        var telephone=fields.telephone;
-        var message=createParam();
+        let telephone=fields.telephone;
+        let message=createParam();
         //更新数据库
         function update_sql() {
             mysql(user_sql.select('telephone'),[telephone],function (err0,result0) {
@@ -578,21 +581,30 @@ exports.avatar=function (req,res,next) {
 }
 //更改头像
 exports.changeAvatar=function (req,res,next) {
-    var form=new formidable.IncomingForm();
+    let user_id=req.session.user_id;
+    let form=new formidable.IncomingForm();
     form.parse(req,function (err,fields,files) {
-        // var telephone=fields.telephone;
-        // console.log(fields);
         //去掉图片base64码前面部分data:image/png;base64
-        var base64 = fields.avatar.replace(/^data:image\/\w+;base64,/, "");
+        let base64 = fields.avatar.replace(/^data:image\/\w+;base64,/, "");
         //把base64码转成buffer对象
-        var dataBuffer = new Buffer(base64, 'base64'); 
+        let dataBuffer = new Buffer(base64, 'base64'); 
+        let originalPath = 'public/images/',//从app.js级开始找
+        setName='avatar/'+Date.now()+'.png',
+        path=originalPath+setName;
         // console.log('dataBuffer是否是Buffer对象：'+Buffer.isBuffer(dataBuffer));
         //用fs写入文件
         fs.writeFile(path,dataBuffer,function(err){
             if(err){
                 console.log(err);
             }else{
-               console.log('写入成功！');
+               mysql(user_sql.update('qq_figureurl','id'),[setName,user_id],function (err1,result1) {
+                    if (err1) {
+                        return;         
+                    } else{
+                        req.session.avatar=fields.avatar;
+                        res.send('1');
+                    }
+                })
             }
         })
     })  
@@ -605,7 +617,7 @@ exports.changeAvatar=function (req,res,next) {
 
 exports.test=function (req,res) {
     // res.send('测试数据');
-    var obj={
+    let obj={
         'text': '测试数据'
     };
     res.type('application/json');
@@ -615,22 +627,22 @@ exports.test=function (req,res) {
 
 //获取当前时间
 function getNowFormatDate(date) {
-    var seperator=":";
-    var year=date.getFullYear();
-    var month=date.getMonth()+1;
-    var day=date.getDate();
-    var currentdate=year+"年"+month+"月"+day+"日"+date.getHours()+seperator+date.getMinutes();
+    let seperator=":";
+    let year=date.getFullYear();
+    let month=date.getMonth()+1;
+    let day=date.getDate();
+    let currentdate=year+"年"+month+"月"+day+"日"+date.getHours()+seperator+date.getMinutes();
     return currentdate;
 }
 //改变电话号码显示效果
 function telephone_change(telephone) {
-    var new_telephone=telephone.substr(0,3)+'****'+telephone.substr(7);
+    let new_telephone=telephone.substr(0,3)+'****'+telephone.substr(7);
     return new_telephone;
 }
 //生成随机短信验证码
 function createParam() {
-    var param='';
-    for (var i=0;i<6;i++) {
+    let param='';
+    for (let i=0;i<6;i++) {
         param+=Math.floor(Math.random()*10);
     }  
     return param;
