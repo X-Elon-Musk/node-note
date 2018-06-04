@@ -61,12 +61,8 @@
     //     $(".photoClip-container").show();
     // })
     $("#clipBtn").click(function(){
-        // $('#logo').html('<img src="' + imgsource + '" align="absmiddle">');
-        // $(".photoClip-container").hide();
+        if (!imgsource) return;
         $('.avatar').val(imgsource);
-        // console.log('===========');
-        // console.log(imgsource);
-        // console.log('===========');
         var options={
             type: 'post',
             url: '/changeAvatar',
