@@ -6,8 +6,8 @@ let md5=require('../model/md5.js');
 let svgCaptcha = require('svg-captcha');
 const SMSClient = require('@alicloud/sms-sdk')
 // ACCESS_KEY_ID/ACCESS_KEY_SECRET 根据实际申请的账号信息进行替换
-const accessKeyId = 'LTAINkfU7xNmo0qb'
-const secretAccessKey = 'WNce8J1x0TQFkb57jYOnXW2xyM8pD7'
+const accessKeyId = ''
+const secretAccessKey = ''
 
 let dirname='http://localhost:3389/public/images/';
 
